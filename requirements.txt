@@ -1,0 +1,20 @@
+# Requirements for QuantDash
+# Data handling
+pandas>=2.0.0
+yfinance>=0.2.0
+
+# Backtesting
+backtrader>=1.9.0
+
+# Dashboard & Visualization
+plotly>=5.0.0
+dash>=2.0.0
+dash-bootstrap-components>=1.0.0
+
+# Optional: Streamlit for alternative deployment
+streamlit>=1.25.0
+
+# Development & Testing
+pytest>=7.0.0
+black>=23.0.0
+flake8>=6.0.0
