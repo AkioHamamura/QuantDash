@@ -15,6 +15,7 @@ env/
 *.json
 data/*.csv
 !data/.gitkeep
+.data/*.parquet
 
 # IDE
 .vscode/

@@ -12,7 +12,7 @@ def fetch_stock_data(ticker,
                      end_date=None, 
                      period=None, 
                      interval="1d",
-                     save_to_parquet=True,
+                     save_to_parquet=False,
                      save_to_csv=False,
                      use_cache=True,
                      force_refresh=False
@@ -97,7 +97,7 @@ def fetch_stock_data(ticker,
             data = yf.download(ticker, period="max", interval=interval, auto_adjust=True)
         
         download_time = (time.time() - download_start) * 1000  # Convert to milliseconds
-        print(f"Data downloaded from Yahoo Finance: {data.shape[0]} rows in {download_time:.2f} ms")
+        print(f"Data downloaded from Yahoo Finance: {data.shape[0]} rows in {download_time:.2f} ms") # type: ignore
 
         if data is not None and not data.empty:
             # Auto-save to cache (parquet preferred for performance)
