@@ -3,8 +3,11 @@ import pandas as pd
 import yfinance as yf
 import matplotlib.pyplot as plt
 import time
-from utils.globals import DATA_PATH
+import sys
+import os
 
+# Fix import path when running from different directories
+from utils.globals import DATA_PATH
 
 def fetch_stock_data(ticker,
                      *, 
