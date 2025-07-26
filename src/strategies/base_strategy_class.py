@@ -110,10 +110,22 @@ class BaseStrategy(ABC):
         
         return df
 
+
     @abstractmethod
     def generate_signals(self, data: pd.DataFrame) -> pd.DataFrame:
         """Generate buy/sell signals based on strategy logic"""
-        pass
+        raise NotImplementedError("Subclasses must implement generate_signals method")
+
+
+    @abstractmethod
+    def visualize_results(self, results: Dict):
+        """
+        Visualizes the results of a backtest using Plotly for interactive charts.
+        
+        Should be overridden by subclasses to provide strategy-specific visualizations.
+        """
+        raise NotImplementedError("Subclasses must implement visualize_results method")
+
 
     def simulate_trading(self, data: pd.DataFrame, verbose: bool = True) -> Dict:
         """

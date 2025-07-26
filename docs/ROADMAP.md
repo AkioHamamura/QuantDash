@@ -3,9 +3,23 @@
 ## 🎯 Project Vision
 Build an interactive web dashboard for backtesting algorithmic trading strategies with real-time performance visualization.
 
-## 📅 5-Night Sprint Schedule
+## 📅 5-Night Sprint Schedu## 📞 Current Priority
 
-### ✅ **Day 1 (Monday) - COMPLETED**
+**FOCUS: Complete Day 4 (Thursday) deliverables**
+1. Build Dash web dashboard application
+2. Integrate existing visualization system into web interface
+3. Add interactive parameter controls for strategy customization
+4. Implement ticker selection and date range functionality
+5. Add export capabilities and polish user experience
+
+**Recent Achievements:**
+- ✅ Fixed all circular import issues in the backtesting system
+- ✅ Built comprehensive visualization with interactive charts
+- ✅ Successfully running end-to-end backtests with AAPL/NVDA data
+- ✅ Created professional three-panel chart layout with metrics table
+- ✅ Implemented proper trade tracking and hover information
+
+**Next Action:** Create Dash web application wrapper and integrate interactive controls.**Day 1 (Monday) - COMPLETED**
 **Project Foundation**
 - [x] Setup conda environment (`quant`)
 - [x] Install dependencies (pandas, yfinance, backtrader, plotly, dash)
@@ -28,33 +42,39 @@ Build an interactive web dashboard for backtesting algorithmic trading strategie
 - ✅ Comprehensive metrics system (`src/backtesting/metrics.py`)
 - ✅ Complete time-series data for plotting and dashboard integration
 
-### � **Day 3 (Wednesday) - IN PROGRESS**
-**Dashboard Development**
-- [ ] Create basic Dash application structure
-- [ ] Build price chart with moving averages (Plotly)
-- [ ] Add equity curve visualization
-- [ ] Implement KPI cards (Sharpe, CAGR, Max Drawdown)
-- [ ] Add ticker selection dropdown
-- [ ] Connect backtest results to dashboard
+### ✅ **Day 3 (Wednesday) - COMPLETED**
+**Visualization & Dashboard Core**
+- [x] Fix circular import issues in backtesting engine
+- [x] Implement comprehensive visualization system with Plotly
+- [x] Create three-panel interactive charts (price/signals, portfolio, metrics)
+- [x] Add buy/sell signal markers with trade information
+- [x] Display moving averages on price chart
+- [x] Create performance metrics table with all key statistics
+- [x] Handle MultiIndex DataFrame structures properly
+- [x] Add hover information showing shares bought/sold and P&L
 
 **Key Deliverables:**
-- Interactive price charts
-- Real-time strategy performance display
-- Basic dashboard navigation
+- ✅ Complete visualization system (`src/backtesting/viz.py`)
+- ✅ Fixed circular imports by creating `backtesting/types.py`
+- ✅ Interactive charts showing price, signals, portfolio value, and metrics
+- ✅ Working end-to-end backtest with visualization for AAPL and NVDA
 
-### 🎨 **Day 4 (Thursday)**
-**Polish & Enhancement**
+### 🎨 **Day 4 (Thursday) - CURRENT FOCUS**
+**Dashboard Integration & Enhancement**
+- [ ] Create Dash web application wrapper around visualization
+- [ ] Add ticker selection dropdown with real-time updates
+- [ ] Implement strategy parameter controls (MA periods, initial capital)
 - [ ] Add date range picker for backtesting periods
 - [ ] Implement dark/light theme toggle
-- [ ] Add strategy parameter controls
-- [ ] Optimize dashboard performance
-- [ ] Write comprehensive README
-- [ ] Create demo GIF/screenshots
+- [ ] Add export functionality for charts and results
+- [ ] Optimize dashboard performance and responsiveness
+- [ ] Write comprehensive README with usage examples
 
 **Key Deliverables:**
-- Polished user interface
-- Documentation with usage examples
-- Demo materials
+- Interactive web dashboard
+- Parameter customization interface
+- Export capabilities
+- Professional documentation
 
 ### 🚀 **Day 5 (Friday)**
 **Deployment & Sharing**
@@ -93,11 +113,21 @@ Build an interactive web dashboard for backtesting algorithmic trading strategie
 - ✅ Custom backtesting engine with BaseStrategy integration
 - ✅ Comprehensive performance metrics calculation
 - ✅ Complete time-series data output for visualization
+- ✅ Portfolio value tracking and drawdown calculation
+- ✅ Trade execution simulation with realistic position sizing
+- ✅ Circular import resolution and modular architecture
 - ⏳ Multi-strategy comparison
 - ⏳ Parameter optimization
 
-### **Dashboard Interface**
-- ⏳ Interactive price charts
+### **Visualization System**
+- ✅ Interactive Plotly charts with three-panel layout
+- ✅ Price charts with moving averages and trading signals
+- ✅ Portfolio value tracking over time
+- ✅ Comprehensive performance metrics table
+- ✅ Trade information on hover (shares, P&L)
+- ✅ MultiIndex DataFrame support
+- ⏳ Dashboard web interface
+- ⏳ Real-time parameter adjustments
 - ⏳ Strategy performance visualization
 - ⏳ Parameter optimization controls
 - ⏳ Export capabilities

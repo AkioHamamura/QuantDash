@@ -1,7 +1,7 @@
 
 
 
-def visualize_backtest_results(backtest_results):
+def visualize_results(results):
     """
     Visualizes the results of a backtest using Plotly for interactive charts.
 
@@ -14,7 +14,7 @@ def visualize_backtest_results(backtest_results):
     
     # Debug: Print the structure of backtest_results
     print("=== DEBUG: Backtest Results Structure ===")
-    print(f"Keys in backtest_results: {list(backtest_results.keys())}")
+    print(f"Keys in backtest_results: {list(results.keys())}")
     
     # Create subplots: stock price + signals, portfolio value, metrics table
     fig = make_subplots(
@@ -28,7 +28,7 @@ def visualize_backtest_results(backtest_results):
                [{"type": "table"}]]
     )
     
-    data = backtest_results['data']
+    data = results['data']
     print(f"Data shape: {data.shape}")
     print(f"Data columns: {list(data.columns)}")
     print(f"Data index type: {type(data.index)}")
@@ -73,7 +73,7 @@ def visualize_backtest_results(backtest_results):
         try:
             fig.add_trace(
                 go.Scatter(x=data.index, y=data['MA_Fast'], 
-                          name=f"MA Fast ({backtest_results['parameters']['fast_period']})", 
+                          name=f"MA Fast ({results['parameters']['fast_period']})", 
                           line=dict(color='blue', width=1.5)),
                 row=1, col=1
             )
@@ -85,7 +85,7 @@ def visualize_backtest_results(backtest_results):
         try:
             fig.add_trace(
                 go.Scatter(x=data.index, y=data['MA_Slow'], 
-                          name=f"MA Slow ({backtest_results['parameters']['slow_period']})", 
+                          name=f"MA Slow ({results['parameters']['slow_period']})", 
                           line=dict(color='red', width=1.5)),
                 row=1, col=1
             )
@@ -114,7 +114,7 @@ def visualize_backtest_results(backtest_results):
                 print(f"Sell signal dates: {sell_signals.index.tolist()}")
         
         # Get trade information
-        trades = backtest_results.get('trades', [])
+        trades = results.get('trades', [])
         print(f"Number of trades: {len(trades)}")
         
         # Add buy signals
@@ -226,23 +226,23 @@ def visualize_backtest_results(backtest_results):
                 'Volatility (%)'
             ],
             'Value': [
-                backtest_results.get('strategy', 'N/A'),
-                f"${backtest_results.get('initial_cash', 0):,.2f}",
-                f"${backtest_results.get('final_value', 0):,.2f}",
-                f"{backtest_results.get('total_return_pct', 0):.2f}%",
-                str(backtest_results.get('total_trades', 0)),
-                str(backtest_results.get('winning_trades', 0)),
-                f"{backtest_results.get('win_rate_pct', 0):.1f}%",
-                f"{backtest_results.get('sharpe_ratio', 0):.3f}",
-                f"{backtest_results.get('sortino_ratio', 0):.3f}",
-                f"{backtest_results.get('max_drawdown_pct', 0):.2f}%",
-                f"{backtest_results.get('volatility_pct', 0):.2f}%"
+                results.get('strategy', 'N/A'),
+                f"${results.get('initial_cash', 0):,.2f}",
+                f"${results.get('final_value', 0):,.2f}",
+                f"{results.get('total_return_pct', 0):.2f}%",
+                str(results.get('total_trades', 0)),
+                str(results.get('winning_trades', 0)),
+                f"{results.get('win_rate_pct', 0):.1f}%",
+                f"{results.get('sharpe_ratio', 0):.3f}",
+                f"{results.get('sortino_ratio', 0):.3f}",
+                f"{results.get('max_drawdown_pct', 0):.2f}%",
+                f"{results.get('volatility_pct', 0):.2f}%"
             ]
         }
         
         # Add strategy parameters if available
-        if 'parameters' in backtest_results:
-            params = backtest_results['parameters']
+        if 'parameters' in results:
+            params = results['parameters']
             if 'fast_period' in params and 'slow_period' in params:
                 metrics_data['Metric'].insert(1, 'Parameters')
                 metrics_data['Value'].insert(1, f"Fast MA: {params['fast_period']}, Slow MA: {params['slow_period']}")
@@ -274,7 +274,7 @@ def visualize_backtest_results(backtest_results):
     
     # Update layout
     fig.update_layout(
-        title=f"Backtest Results: {backtest_results.get('strategy', 'Unknown Strategy')}",
+        title=f"Backtest Results: {results.get('strategy', 'Unknown Strategy')}",
         height=1000,  # Increased height to accommodate the metrics table
         showlegend=True,
         template='plotly_white',

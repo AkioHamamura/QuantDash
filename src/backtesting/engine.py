@@ -16,7 +16,7 @@ class BacktestEngine:
     def __init__(self, strategy: BaseStrategy):
         self.strategy = strategy
 
-    def run(self, data: pd.DataFrame) -> Dict:
+    def run(self, data: pd.DataFrame, visualize: bool = True) -> Dict:
         """Run backtest on historical data"""
         # Initialize strategy
         strategy = self.strategy
@@ -29,5 +29,9 @@ class BacktestEngine:
         
         # Simulate trading - In what format does this return?
         results = strategy.simulate_trading(data_with_signals)
-        
+
+        # Visualize results (True by default)
+        if visualize:
+            strategy.visualize_results(results)
+
         return results
