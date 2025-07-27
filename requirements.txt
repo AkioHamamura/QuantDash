@@ -6,6 +6,12 @@ yfinance>=0.2.0
 # Backtesting
 backtrader>=1.9.0
 
+# API & Backend
+fastapi>=0.115.0
+uvicorn>=0.34.0
+pydantic>=2.9.0
+python-multipart>=0.0.20
+
 # Dashboard & Visualization
 plotly>=5.0.0
 dash>=2.0.0

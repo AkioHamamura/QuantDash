@@ -6,8 +6,8 @@ from typing import Dict, List, Tuple, Optional, Type
 from datetime import datetime
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
-from src.backtesting.types import Trade
-from src.strategies.base_strategy_class import BaseStrategy # Abstract Base Class import    
+from backtesting.types import Trade
+from strategies.base_strategy_class import BaseStrategy # Abstract Base Class import
 
 
 class BacktestEngine:
@@ -16,7 +16,7 @@ class BacktestEngine:
     def __init__(self, strategy: BaseStrategy):
         self.strategy = strategy
 
-    def run(self, data: pd.DataFrame, visualize: bool = True) -> Dict:
+    def run(self, data: pd.DataFrame, visualize: bool = True):
         """Run backtest on historical data"""
         # Initialize strategy
         strategy = self.strategy
@@ -31,7 +31,6 @@ class BacktestEngine:
         results = strategy.simulate_trading(data_with_signals)
 
         # Visualize results (True by default)
-        if visualize:
-            strategy.visualize_results(results)
+        viz = strategy.get_json_visualizations(results)
 
-        return results
+        return results, viz

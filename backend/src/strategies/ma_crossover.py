@@ -11,13 +11,15 @@ Key Concepts:
 
 import pandas as pd
 import numpy as np
-from typing import Dict, List, Tuple, Optional
+from typing import Any, Dict, List, Tuple, Optional
+import plotly.graph_objects as go
+import plotly.io as pio
 from dataclasses import dataclass
 from datetime import datetime
 import sys
 import os
-from src.strategies.base_strategy_class import BaseStrategy
-from src.backtesting.metrics import calculate_comprehensive_metrics
+from strategies.base_strategy_class import BaseStrategy
+from backtesting.metrics import calculate_comprehensive_metrics
 
 
 class MovingAverageCrossover(BaseStrategy):
@@ -88,8 +90,128 @@ class MovingAverageCrossover(BaseStrategy):
         # locates where Signal_Change is -1 and sets Sell_Signal to 1
         df.loc[df['Signal_Change'] == -1, 'Sell_Signal'] = 1
         
-        print(df)  # Print rows for debugging <---------------
         return df
+
+
+    def get_json_visualizations(self, results: Dict) -> Dict[str, Any]:
+        """
+        Build two Plotly charts (JSON-serialised) from the `results` structure your
+        pipeline already returns.
+
+        Expected `results` format
+        -------------------------
+        results = {
+            "data": pd.DataFrame(
+                index=pd.DatetimeIndex,
+                columns=[
+                    "Close",           # required for price plot
+                    "Buy_Signal",      # +1 on long entries, 0 otherwise   (optional)
+                    "Sell_Signal",     # -1 on short entries, 0 otherwise  (optional)
+                    "Portfolio_Value"  # cumulative equity curve           (optional)
+                ]
+            ),
+            ...
+        }
+
+        Returns
+        -------
+        dict[str, str]
+            {
+                "price_and_signals": JSON for price-and-signal figure,
+                "portfolio_value":   JSON for portfolio value figure
+            }
+        """
+        df = results.get("data")
+        if df is None or df.empty:
+            raise ValueError("results['data'] must be a non-empty DataFrame.")
+
+        # ── Price with trading signals ───────────────────────────────────────────
+        fig_price = go.Figure()
+
+        # Price line (mandatory)
+        if "Close" not in df.columns:
+            raise KeyError("'Close' column is required for the price plot.")
+        fig_price.add_trace(
+            go.Scatter(
+                x=df.index,
+                y=df["Close"],
+                mode="lines",
+                name="Close"
+            )
+        )
+
+        # Buy / long markers
+        if "Buy_Signal" in df.columns:
+            buys = df["Buy_Signal"] == 1
+            fig_price.add_trace(
+                go.Scatter(
+                    x=df.index[buys],
+                    y=df["Close"][buys],
+                    mode="markers",
+                    marker_symbol="triangle-up",
+                    marker_size=9,
+                    name="Buy"
+                )
+            )
+
+        # Sell / short markers
+        if "Sell_Signal" in df.columns:
+            sells = df["Sell_Signal"] == -1
+            fig_price.add_trace(
+                go.Scatter(
+                    x=df.index[sells],
+                    y=df["Close"][sells],
+                    mode="markers",
+                    marker_symbol="triangle-down",
+                    marker_size=9,
+                    name="Sell"
+                )
+            )
+
+        fig_price.update_layout(
+            title="Price & Trading Signals",
+            xaxis_title="Date",
+            yaxis_title="Price",
+            legend_orientation="h",
+            template="plotly_white",
+            margin=dict(l=40, r=20, t=35, b=35)
+        )
+
+        # ── Portfolio value curve ────────────────────────────────────────────────
+        fig_port = go.Figure()
+        if "Portfolio_Value" in df.columns:
+            fig_port.add_trace(
+                go.Scatter(
+                    x=df.index,
+                    y=df["Portfolio_Value"],
+                    mode="lines",
+                    name="Portfolio value"
+                )
+            )
+        else:
+            # Return an empty figure rather than erroring out; frontend can decide.
+            fig_port.add_annotation(
+                xref="paper", yref="paper",
+                x=0.5, y=0.5,
+                text="No 'Portfolio_Value' column supplied",
+                showarrow=False
+            )
+
+        fig_port.update_layout(
+            title="Portfolio Value",
+            xaxis_title="Date",
+            yaxis_title="Equity",
+            template="plotly_white",
+            margin=dict(l=40, r=20, t=35, b=35)
+        )
+
+        # ── Serialise for painless frontend consumption ─────────────────────────
+        return {
+            "price_and_signals": pio.to_json(fig_price, validate=False),
+            "portfolio_value":   pio.to_json(fig_port, validate=False),
+        }
+        
+        
 
 
     def visualize_results(self, results: Dict):
@@ -102,10 +224,7 @@ class MovingAverageCrossover(BaseStrategy):
         import plotly.graph_objects as go
         from plotly.subplots import make_subplots
         import pandas as pd
-        
-        # Debug: Print the structure of backtest_results
-        print("=== DEBUG: Backtest Results Structure ===")
-        print(f"Keys in backtest_results: {list(results.keys())}")
+
         
         # Create subplots: stock price + signals, portfolio value, metrics table
         fig = make_subplots(
@@ -120,10 +239,6 @@ class MovingAverageCrossover(BaseStrategy):
         )
         
         data = results['data']
-        print(f"Data shape: {data.shape}")
-        print(f"Data columns: {list(data.columns)}")
-        print(f"Data index type: {type(data.index)}")
-        print(f"First few rows:\n{data.head()}")
         
         # Check if we have the required columns
         required_cols = ['Close', 'Buy_Signal', 'Sell_Signal', 'Portfolio_Value']
@@ -378,11 +493,6 @@ class MovingAverageCrossover(BaseStrategy):
         
         # Update x-axes
         fig.update_xaxes(title_text="Date", row=2, col=1)
-        
-        print("=== DEBUG: Showing plot ===")
-        
-        # Show the plot
-        fig.show()
         
         return fig
 

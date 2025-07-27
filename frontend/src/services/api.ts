@@ -4,12 +4,26 @@ const API_BASE_URL = 'http://localhost:8000/api';
 export interface BacktestRequest {
   symbol: string;
   period?: string;
-  strategy_params?: Record<string, any>;
+  algorithm: string;
+  initial_cash?: number; // Initial cash for the backtest
+  algorithm_specific_params?: Record<string, any>;
 }
 
 export interface BacktestResponse {
   success: boolean;
-  data?: any;
+  data?: {
+    total_return: number;
+    sharpe_ratio: number;
+    sortino_ratio: number;
+    max_drawdown: number;
+    volatility_pct: number;
+    win_rate?: number;
+    profit_factor?: number;
+    portfolio_values: number[];
+    trades: any[];
+  };
+  results?: any; // Keep for backward compatibility
+  plot?: string; // URL to the plot image
   error?: string;
 }
 
@@ -36,19 +50,5 @@ export const apiClient = {
       };
     }
   },
-
-  async getStockData(symbol: string, period: string = '1y') {
-    try {
-      const response = await fetch(`${API_BASE_URL}/stocks/${symbol}/data?period=${period}`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Failed to fetch stock data:', error);
-      return null;
-    }
-  },
+  // Add more API methods as needed
 };

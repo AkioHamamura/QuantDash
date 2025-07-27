@@ -1,1 +1,1 @@
-DATA_PATH = "/Users/jakobildstad/Dev/QuantDash/cache"
+DATA_PATH = "backend/cache"

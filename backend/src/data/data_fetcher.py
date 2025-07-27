@@ -7,7 +7,7 @@ import sys
 import os
 
 # Fix import path when running from different directories
-from src.utils.globals import DATA_PATH
+from utils.globals import DATA_PATH
 
 def fetch_stock_data(ticker,
                      *, 

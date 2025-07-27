@@ -11,7 +11,7 @@ def main():
     #run_dash_app()
 
     #fetch_stock_data("CARV", save_to_csv=True)
-    data = fetch_stock_data("AAPL", period="1y")
+    data = fetch_stock_data("AAPL", period="3y")
     if data is None or data.empty:
         print("Failed to fetch data")
         return

@@ -5,21 +5,55 @@ Build an interactive web dashboard for backtesting algorithmic trading strategie
 
 ## 📅 5-Night Sprint Schedu## 📞 Current Priority
 
-**FOCUS: Complete Day 4 (Thursday) deliverables**
-1. Build Dash web dashboard application
-2. Integrate existing visualization system into web interface
-3. Add interactive parameter controls for strategy customization
-4. Implement ticker selection and date range functionality
-5. Add export capabilities and polish user experience
+**FOCUS: Connect React Frontend to Python Backe## 📚 Documentation
+
+- ✅ **METRICS.md** - Comprehensive guide to all performance metrics
+- ✅ **STRATEGY_DEVELOPMENT.md** - How to create new trading strategies
+- ✅ **Frontend README.md** - React frontend setup and integration guide
+- ⏳ **API_REFERENCE.md** - FastAPI endpoints documentation
+- ⏳ **DEPLOYMENT.md** - Production deployment guide
+
+---
+
+## 📚 Learning Focus Area
+
+### **React Frontend (Current Priority)**
+- Understanding component structure and data flow
+- State management with React hooks
+- API integration patterns
+- TypeScript interfaces for type safety
+
+### **Plotly Integration**
+- React-Plotly.js component usage
+- Chart configuration and styling
+- Data transformation for chart display
+- Interactive features and callbacks
+
+### **FastAPI Development**
+- RESTful API design
+- CORS configuration for frontend
+- Data serialization and validation
+- Error handling and status codes. Learn and understand the simplified React frontend structure
+2. Study Plotly integration for interactive charts
+3. Create FastAPI server to expose backtesting functionality
+4. Connect frontend to backend via REST API
+5. Test end-to-end functionality (form input → backend processing → chart display)
 
 **Recent Achievements:**
+- ✅ Added React frontend from Lovable template
+- ✅ Simplified frontend by removing unnecessary components and dependencies
+- ✅ Moved Python logic to `backend/` folder for clean separation
 - ✅ Fixed all circular import issues in the backtesting system
 - ✅ Built comprehensive visualization with interactive charts
 - ✅ Successfully running end-to-end backtests with AAPL/NVDA data
 - ✅ Created professional three-panel chart layout with metrics table
 - ✅ Implemented proper trade tracking and hover information
 
-**Next Action:** Create Dash web application wrapper and integrate interactive controls.**Day 1 (Monday) - COMPLETED**
+**Next Actions:** 
+1. Understand React frontend components and data flow
+2. Learn Plotly chart integration in React
+3. Build FastAPI server with CORS for frontend communication
+4. Test API endpoints and data serialization**Day 1 (Monday) - COMPLETED**
 **Project Foundation**
 - [x] Setup conda environment (`quant`)
 - [x] Install dependencies (pandas, yfinance, backtrader, plotly, dash)
@@ -59,33 +93,65 @@ Build an interactive web dashboard for backtesting algorithmic trading strategie
 - ✅ Interactive charts showing price, signals, portfolio value, and metrics
 - ✅ Working end-to-end backtest with visualization for AAPL and NVDA
 
-### 🎨 **Day 4 (Thursday) - CURRENT FOCUS**
-**Dashboard Integration & Enhancement**
-- [ ] Create Dash web application wrapper around visualization
-- [ ] Add ticker selection dropdown with real-time updates
-- [ ] Implement strategy parameter controls (MA periods, initial capital)
-- [ ] Add date range picker for backtesting periods
-- [ ] Implement dark/light theme toggle
-- [ ] Add export functionality for charts and results
-- [ ] Optimize dashboard performance and responsiveness
-- [ ] Write comprehensive README with usage examples
+### 🎨 **Day 4 (Thursday) - COMPLETED**
+**Frontend Architecture & Setup**
+- [x] Add React frontend from Lovable template
+- [x] Simplify frontend by removing unnecessary dependencies (50+ → 15)
+- [x] Remove complex routing, components, and UI libraries
+- [x] Move Python logic to `backend/` folder structure
+- [x] Create clean separation between frontend and backend
+- [x] Setup development environment with conda integration
+- [x] Create comprehensive frontend documentation and guides
 
 **Key Deliverables:**
-- Interactive web dashboard
-- Parameter customization interface
-- Export capabilities
-- Professional documentation
+- ✅ Simplified React frontend with TypeScript and Tailwind CSS
+- ✅ Clean `backend/` and `frontend/` folder structure
+- ✅ Development workflow documentation
+- ✅ Frontend README with integration guides
 
-### 🚀 **Day 5 (Friday)**
+### 🔗 **Day 5 (Friday) - CURRENT FOCUS**
+**Frontend-Backend Integration**
+- [ ] Study and understand React frontend components and data flow
+- [ ] Learn Plotly integration patterns for interactive charts in React
+- [ ] Create FastAPI server in `backend/src/api/server.py`
+- [ ] Implement CORS configuration for frontend communication
+- [ ] Build API endpoints for backtesting and data fetching
+- [ ] Connect frontend forms to backend API calls
+- [ ] Test data serialization (pandas DataFrame → JSON → React charts)
+- [ ] Implement error handling and loading states
+
+**Key Deliverables:**
+- Working FastAPI server with backtesting endpoints
+- Frontend successfully calling backend APIs
+- Plotly charts displaying backtest results
+- End-to-end functionality (form input → backend processing → chart display)
+
+### 🚀 **Day 6 (Saturday)**
+**Enhancement & Polish**
+- [ ] Add more input fields (date ranges, strategy parameters)
+- [ ] Implement multiple chart types (price, portfolio performance, metrics)
+- [ ] Add real-time parameter updates without page refresh
+- [ ] Implement chart export functionality
+- [ ] Add loading states and error handling
+- [ ] Polish UI/UX and responsive design
+- [ ] Test with multiple strategies and stocks
+
+**Key Deliverables:**
+- Fully functional trading dashboard
+- Multiple interactive charts
+- Professional user experience
+
+### 🌐 **Day 7 (Sunday)**
 **Deployment & Sharing**
-- [ ] Deploy to Streamlit Cloud or Render
+- [ ] Deploy backend to cloud service (Render, Railway, or Heroku)
+- [ ] Deploy frontend to Vercel or Netlify
 - [ ] Test production deployment
 - [ ] Create LinkedIn/Reddit posts
 - [ ] Pin repository to GitHub profile
 - [ ] Share with trading communities
 
 **Key Deliverables:**
-- Live production URL
+- Live production URLs
 - Social media presence
 - Community engagement
 
@@ -119,6 +185,24 @@ Build an interactive web dashboard for backtesting algorithmic trading strategie
 - ⏳ Multi-strategy comparison
 - ⏳ Parameter optimization
 
+### **Frontend Architecture**
+- ✅ React 18 with TypeScript (simplified from Lovable template)
+- ✅ Vite for fast development and building
+- ✅ Tailwind CSS for styling
+- ✅ Basic UI components (removed 35+ unnecessary components)
+- ✅ Simple API client for backend communication
+- ⏳ Plotly integration for interactive charts
+- ⏳ Real-time parameter adjustments
+- ⏳ Form validation and error handling
+
+### **Backend API**
+- ⏳ FastAPI server with CORS configuration
+- ⏳ RESTful endpoints for backtesting
+- ⏳ Data serialization (pandas → JSON)
+- ⏳ Error handling and validation
+- ⏳ Strategy parameter endpoints
+- ⏳ Stock data endpoints
+
 ### **Visualization System**
 - ✅ Interactive Plotly charts with three-panel layout
 - ✅ Price charts with moving averages and trading signals
@@ -126,10 +210,8 @@ Build an interactive web dashboard for backtesting algorithmic trading strategie
 - ✅ Comprehensive performance metrics table
 - ✅ Trade information on hover (shares, P&L)
 - ✅ MultiIndex DataFrame support
-- ⏳ Dashboard web interface
-- ⏳ Real-time parameter adjustments
-- ⏳ Strategy performance visualization
-- ⏳ Parameter optimization controls
+- ⏳ React-Plotly integration
+- ⏳ Real-time chart updates
 - ⏳ Export capabilities
 
 ---
@@ -138,15 +220,26 @@ Build an interactive web dashboard for backtesting algorithmic trading strategie
 
 ```
 QuantDash/
-├── src/
-│   ├── data/           # Data fetching & caching
-│   ├── strategies/     # Trading strategy implementations
-│   ├── backtesting/    # Performance analysis engine
-│   ├── dashboard/      # Dash web application
-│   └── utils/          # Helper functions
-├── config/             # Strategy parameters (YAML)
-├── data/              # Cached historical data
-└── docs/              # Documentation & roadmap
+├── backend/
+│   ├── src/
+│   │   ├── api/            # FastAPI server & endpoints
+│   │   ├── data/           # Data fetching & caching
+│   │   ├── strategies/     # Trading strategy implementations
+│   │   ├── backtesting/    # Performance analysis engine
+│   │   └── utils/          # Helper functions
+│   ├── requirements.txt    # Python dependencies
+│   └── main.py            # Backend entry point
+├── frontend/
+│   ├── src/
+│   │   ├── components/     # React components
+│   │   ├── pages/         # Main dashboard page
+│   │   ├── services/      # API client for backend calls
+│   │   └── App.tsx        # React app entry
+│   ├── package.json       # Simplified npm dependencies
+│   └── README.md          # Frontend documentation
+├── data/                  # Cached historical data
+├── config/                # Strategy parameters (YAML)
+└── docs/                  # Documentation & roadmap
 ```
 
 ---
