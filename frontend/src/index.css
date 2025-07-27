@@ -1,0 +1,196 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* Trading Dashboard Design System */
+
+@layer base {
+  :root {
+    --background: 48 20% 95%;
+    --foreground: 140 15% 20%;
+
+    --card: 48 30% 98%;
+    --card-foreground: 140 15% 20%;
+
+    --popover: 48 30% 98%;
+    --popover-foreground: 140 15% 20%;
+
+    --primary: 140 40% 25%;
+    --primary-foreground: 48 30% 98%;
+
+    --secondary: 48 15% 88%;
+    --secondary-foreground: 140 15% 20%;
+
+    --muted: 48 15% 88%;
+    --muted-foreground: 140 10% 45%;
+
+    --accent: 140 25% 85%;
+    --accent-foreground: 140 15% 20%;
+
+    --destructive: 0 73% 55%;
+    --destructive-foreground: 48 30% 98%;
+
+    --success: 140 50% 30%;
+    --success-foreground: 48 30% 98%;
+
+    --warning: 45 93% 47%;
+    --warning-foreground: 48 30% 98%;
+
+    --border: 140 20% 80%;
+    --input: 140 20% 80%;
+    --ring: 140 40% 25%;
+
+    --radius: 0.5rem;
+
+    /* Trading specific colors */
+    --chart-grid: 210 17% 93%;
+    --chart-text: 210 6% 46%;
+    --bull-green: 142 76% 36%;
+    --bear-red: 0 73% 55%;
+    --ma-fast: 214 100% 47%;
+    --ma-slow: 276 100% 47%;
+    --portfolio-green: 142 76% 36%;
+
+    /* Gradient colors */
+    --gradient-primary: linear-gradient(135deg, hsl(214 100% 47%), hsl(276 100% 47%));
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(120 76% 50%));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card) / 0.8));
+    --gradient-button: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent) / 0.6));
+
+    /* Typography */
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -2px hsl(0 0% 0% / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -4px hsl(0 0% 0% / 0.1);
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold;
+  }
+
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+}
+
+@layer utilities {
+  .chart-tooltip {
+    @apply bg-card border border-border rounded-lg shadow-lg p-3;
+  }
+
+  .metric-card {
+    @apply bg-gradient-to-br from-card via-card/95 to-card/85 border border-border rounded-lg p-4 shadow-lg backdrop-blur-sm transition-all duration-300;
+    background-image: 
+      radial-gradient(circle at 50% 0%, hsl(var(--accent) / 0.1) 0%, transparent 50%),
+      linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.95) 50%, hsl(var(--card) / 0.85) 100%);
+  }
+
+  .trading-signal-buy {
+    @apply text-bull-green;
+  }
+
+  .trading-signal-sell {
+    @apply text-bear-red;
+  }
+
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-success {
+    background: var(--gradient-success);
+  }
+
+  .gradient-button {
+    background: var(--gradient-button);
+  }
+
+  .gradient-card {
+    background: var(--gradient-card);
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .hover-lift {
+    @apply transition-all duration-300 hover:transform hover:scale-105 hover:shadow-2xl;
+  }
+}

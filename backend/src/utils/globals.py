@@ -1,0 +1,1 @@
+DATA_PATH = "/Users/jakobildstad/Dev/QuantDash/cache"
