@@ -51,7 +51,7 @@ async def run_backtest(request: BacktestRequest):
         print(f"Received request: {request}")
         
         # Fetch data using your existing function
-        data = fetch_stock_data(request.symbol, period=request.period, use_cache=False)
+        data = fetch_stock_data(request.symbol, period=request.period, use_cache=True)
         if data is None or data.empty:
             return {"success": False, "error": "Failed to fetch data"}
         
@@ -92,12 +92,13 @@ async def run_backtest(request: BacktestRequest):
                 "strategy": serializable_results.get("strategy", "Moving Average Crossover"),
                 "parameters": serializable_results.get("parameters", {}),
                 "total_return": serializable_results.get("total_return_pct", 0),
+                "final_value": serializable_results.get("final_value", 0),
                 "sharpe_ratio": serializable_results.get("sharpe_ratio", 0),
                 "sortino_ratio": serializable_results.get("sortino_ratio", 0),
                 "max_drawdown": serializable_results.get("max_drawdown_pct", 0),
                 "volatility_pct": serializable_results.get("volatility_pct", 0),
                 "win_rate": serializable_results.get("win_rate_pct", 0),
-                "profit_factor": serializable_results.get("profit_factor", 1.0),
+                "total_trades": serializable_results.get("total_trades", 0),
                 "portfolio_values": serializable_results.get("portfolio_values", []),
                 "trades": serializable_results.get("trades", [])
             }
@@ -107,17 +108,22 @@ async def run_backtest(request: BacktestRequest):
                 "strategy": "Moving Average Crossover",
                 "parameters": {},
                 "total_return": 0,
+                "final_value": 0,
                 "sharpe_ratio": 0,
                 "sortino_ratio": 0,
                 "max_drawdown": 0,
                 "volatility_pct": 0,
                 "win_rate": 0,
-                "profit_factor": 1.0,
+                "total_trades": 0,
                 "portfolio_values": [],
                 "trades": []
             }
 
-        return {"success": True, "data": frontend_results, "viz": viz}
+        return {
+            "success": True, 
+            "data": frontend_results, 
+            "visualizations": viz  # Include the visualization data from get_json_visualizations()
+        }
 
     except Exception as e:
         import traceback

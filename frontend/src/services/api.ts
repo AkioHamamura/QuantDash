@@ -13,14 +13,19 @@ export interface BacktestResponse {
   success: boolean;
   data?: {
     total_return: number;
+    final_value: number;
     sharpe_ratio: number;
     sortino_ratio: number;
     max_drawdown: number;
     volatility_pct: number;
     win_rate?: number;
-    profit_factor?: number;
+    total_trades: number;
     portfolio_values: number[];
     trades: any[];
+  };
+  visualizations?: {
+    price_and_signals: string;  // JSON string from plotly
+    portfolio_value: string;    // JSON string from plotly
   };
   results?: any; // Keep for backward compatibility
   plot?: string; // URL to the plot image

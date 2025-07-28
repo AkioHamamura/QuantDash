@@ -1,1 +1,1 @@
-DATA_PATH = "backend/cache"
+DATA_PATH = "cache"

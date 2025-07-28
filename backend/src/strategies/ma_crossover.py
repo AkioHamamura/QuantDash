@@ -125,6 +125,46 @@ class MovingAverageCrossover(BaseStrategy):
         if df is None or df.empty:
             raise ValueError("results['data'] must be a non-empty DataFrame.")
 
+        # DEBUG: Print information about the data we received
+        print(f"DEBUG get_json_visualizations:")
+        print(f"  - DataFrame shape: {df.shape}")
+        print(f"  - Columns: {list(df.columns)}")
+        print(f"  - Index type: {type(df.index)}")
+        print(f"  - Date range: {df.index.min()} to {df.index.max()}")
+        
+        # CRITICAL FIX: Handle MultiIndex columns - flatten them for easier access
+        if isinstance(df.columns, pd.MultiIndex):
+            print("  - Flattening MultiIndex columns...")
+            # Flatten MultiIndex columns by taking the first level that's not empty
+            new_columns = []
+            for col in df.columns:
+                if isinstance(col, tuple):
+                    # Take the first non-empty part of the tuple
+                    new_col = col[0] if col[0] else col[1] if len(col) > 1 else str(col)
+                else:
+                    new_col = col
+                new_columns.append(new_col)
+            df = df.copy()  # Create a copy to avoid modifying original
+            df.columns = new_columns
+            print(f"  - Flattened columns to: {list(df.columns)}")
+        
+        # Check for key columns
+        if 'MA_Fast' in df.columns:
+            print(f"  - MA_Fast values (first 5): {df['MA_Fast'].head().tolist()}")
+        else:
+            print("  - WARNING: MA_Fast column missing!")
+            
+        if 'MA_Slow' in df.columns:
+            print(f"  - MA_Slow values (first 5): {df['MA_Slow'].head().tolist()}")
+        else:
+            print("  - WARNING: MA_Slow column missing!")
+            
+        # Check signal counts
+        buy_signals = (df['Buy_Signal'] == 1).sum() if 'Buy_Signal' in df.columns else 0
+        sell_signals = (df['Sell_Signal'] == 1).sum() if 'Sell_Signal' in df.columns else 0
+        print(f"  - Buy signals: {buy_signals}")
+        print(f"  - Sell signals: {sell_signals}")
+
         # ── Price with trading signals ───────────────────────────────────────────
         fig_price = go.Figure()
 
@@ -136,45 +176,69 @@ class MovingAverageCrossover(BaseStrategy):
                 x=df.index,
                 y=df["Close"],
                 mode="lines",
-                name="Close"
+                name="Close Price",
+                line=dict(color='black', width=2)
             )
         )
 
-        # Buy / long markers
+        # Add Moving Averages if they exist (like in visualize_results)
+        if 'MA_Fast' in df.columns:
+            fig_price.add_trace(
+                go.Scatter(
+                    x=df.index, 
+                    y=df['MA_Fast'], 
+                    name=f"MA Fast ({results.get('parameters', {}).get('fast_period', 'N/A')})", 
+                    line=dict(color='blue', width=1.5)
+                )
+            )
+        
+        if 'MA_Slow' in df.columns:
+            fig_price.add_trace(
+                go.Scatter(
+                    x=df.index, 
+                    y=df['MA_Slow'], 
+                    name=f"MA Slow ({results.get('parameters', {}).get('slow_period', 'N/A')})", 
+                    line=dict(color='red', width=1.5)
+                )
+            )
+
+        # Buy / long markers (with proper styling like visualize_results)
         if "Buy_Signal" in df.columns:
             buys = df["Buy_Signal"] == 1
-            fig_price.add_trace(
-                go.Scatter(
-                    x=df.index[buys],
-                    y=df["Close"][buys],
-                    mode="markers",
-                    marker_symbol="triangle-up",
-                    marker_size=9,
-                    name="Buy"
+            if buys.any():  # Only add if there are buy signals
+                fig_price.add_trace(
+                    go.Scatter(
+                        x=df.index[buys],
+                        y=df["Close"][buys],
+                        mode="markers",
+                        marker=dict(symbol='triangle-up', size=15, color='green'),
+                        name="Buy Signal"
+                    )
                 )
-            )
 
-        # Sell / short markers
+        # Sell / short markers (with proper styling like visualize_results)  
         if "Sell_Signal" in df.columns:
-            sells = df["Sell_Signal"] == -1
-            fig_price.add_trace(
-                go.Scatter(
-                    x=df.index[sells],
-                    y=df["Close"][sells],
-                    mode="markers",
-                    marker_symbol="triangle-down",
-                    marker_size=9,
-                    name="Sell"
+            sells = df["Sell_Signal"] == 1  # Changed from -1 to 1 to match generate_signals
+            if sells.any():  # Only add if there are sell signals
+                fig_price.add_trace(
+                    go.Scatter(
+                        x=df.index[sells],
+                        y=df["Close"][sells],
+                        mode="markers",
+                        marker=dict(symbol='triangle-down', size=15, color='red'),
+                        name="Sell Signal"
+                    )
                 )
-            )
 
         fig_price.update_layout(
-            title="Price & Trading Signals",
+            title="Stock Price & Trading Signals",
             xaxis_title="Date",
-            yaxis_title="Price",
+            yaxis_title="Price ($)",
             legend_orientation="h",
             template="plotly_white",
-            margin=dict(l=40, r=20, t=35, b=35)
+            margin=dict(l=40, r=20, t=35, b=35),
+            showlegend=True,
+            hovermode='x unified'
         )
 
         # ── Portfolio value curve ────────────────────────────────────────────────
@@ -185,7 +249,9 @@ class MovingAverageCrossover(BaseStrategy):
                     x=df.index,
                     y=df["Portfolio_Value"],
                     mode="lines",
-                    name="Portfolio value"
+                    name="Portfolio Value",
+                    line=dict(color='green', width=2),
+                    hovertemplate='Date: %{x}<br>Portfolio Value: $%{y:,.2f}<extra></extra>'
                 )
             )
         else:
@@ -198,11 +264,12 @@ class MovingAverageCrossover(BaseStrategy):
             )
 
         fig_port.update_layout(
-            title="Portfolio Value",
+            title="Portfolio Value Over Time",
             xaxis_title="Date",
-            yaxis_title="Equity",
+            yaxis_title="Portfolio Value ($)",
             template="plotly_white",
-            margin=dict(l=40, r=20, t=35, b=35)
+            margin=dict(l=40, r=20, t=35, b=35),
+            showlegend=True
         )
 
         # ── Serialise for painless frontend consumption ─────────────────────────

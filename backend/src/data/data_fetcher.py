@@ -58,6 +58,7 @@ def fetch_stock_data(ticker,
     
     # Check for cached data first (if use_cache=True and not force_refresh)
     if use_cache and not force_refresh:
+        print("Checking for cached data...")
         # Check for parquet cache first (faster)
         if os.path.exists(parquet_cache_file):
             try:

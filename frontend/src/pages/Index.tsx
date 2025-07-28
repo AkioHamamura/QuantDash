@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 import { apiClient } from '@/services/api'; // Adjust the import path as necessary
-//import Plot from 'react-plotly.js';
+import Plot from 'react-plotly.js';
 
 
 interface BacktestResults {
   strategy: string;
   parameters: any;
   total_return: number;
+  final_value: number;
   sharpe_ratio: number;
   sortino_ratio: number;
   max_drawdown: number;
   volatility_pct: number;
   win_rate?: number;
-  profit_factor?: number;
+  total_trades: number;
   portfolio_values: number[];
   trades: any[];
 }
@@ -29,6 +30,12 @@ const Index = () => {
   
   const [results, setResults] = useState<BacktestResults | null>(null);
   const [loading, setLoading] = useState(false);
+  
+  // Add state for visualization data
+  const [visualizations, setVisualizations] = useState<{
+    price_and_signals?: any;
+    portfolio_value?: any;
+  }>({});
 
   const algorithms = [
     { value: 'moving_average_crossover', label: 'Moving Average Crossover' },
@@ -90,7 +97,8 @@ const Index = () => {
         }
       });
 
-      const result = await apiClient.runBacktest({
+      const result = await apiClient.runBacktest({ // Sends POST request to backend
+        // The API expects these parameters:
         symbol: symbol,
         period: period,
         algorithm: selectedAlgorithm,
@@ -110,15 +118,26 @@ const Index = () => {
         strategy: selectedAlgorithm,
         parameters: { fast_period: fastPeriod, slow_period: slowPeriod },
         total_return: result.data.total_return || 0,
+        final_value: result.data.final_value || initialCash,
         sharpe_ratio: result.data.sharpe_ratio || 0, 
         sortino_ratio: result.data.sortino_ratio || 0, 
         max_drawdown: result.data.max_drawdown || 0, 
         volatility_pct: result.data.volatility_pct || 0,
-        win_rate: result.data.win_rate || NaN,
-        profit_factor: result.data.profit_factor || 0,
+        win_rate: result.data.win_rate || 0.0,
+        total_trades: result.data.total_trades || 0,
         portfolio_values: result.data.portfolio_values || [],
         trades: result.data.trades || []
       });
+      
+      // Process visualization data from backend
+      if (result.visualizations) {
+        setVisualizations({
+          price_and_signals: result.visualizations.price_and_signals ? 
+            JSON.parse(result.visualizations.price_and_signals) : null,
+          portfolio_value: result.visualizations.portfolio_value ? 
+            JSON.parse(result.visualizations.portfolio_value) : null,
+        });
+      }
     } else {
       alert('Backtest failed: ' + result.error);
     }
@@ -134,7 +153,7 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto space-y-6">
         <h1 className="text-3xl font-bold text-black-900 text-center mb-8">
-          QuantDash - Backtest Your Trading Strategies
+          QuantDash - Backtest Trading Strategies
         </h1>
         
         {/* Parameters Section */}
@@ -225,57 +244,62 @@ const Index = () => {
             <h2 className="text-xl font-semibold mb-6">Backtest Results</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">
-                  {results.total_return > 0 ? '+' : ''}{results.total_return.toFixed(2)}%
+                <div className={`text-2xl font-bold ${results.final_value > initialCash ? 'text-green-600' : 'text-red-600'}`}>
+                  ${results.final_value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
-                <div className="text-sm text-gray-600">Total Return</div>
+                <div className="text-sm text-gray-600">Portfolio Value</div>
               </div>
               
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">
-                  {results.sharpe_ratio.toFixed(2)}
-                </div>
-                <div className="text-sm text-gray-600">Sharpe Ratio</div>
-              </div>
-              
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">
-                  {results.sortino_ratio.toFixed(2)}
-                </div>
-                <div className="text-sm text-gray-600">Sortino Ratio</div>
-              </div>
-              
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">
-                  {results.max_drawdown.toFixed(2)}%
-                </div>
-                <div className="text-sm text-gray-600">Max Drawdown</div>
-              </div>
-              
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">
-                  {results.volatility_pct.toFixed(2)}%
-                </div>
-                <div className="text-sm text-gray-600">Volatility</div>
-              </div>
-              
-              {results.win_rate && (
+              {results.win_rate !== undefined && (
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className={`text-2xl font-bold ${results.win_rate > 50 ? 'text-green-600' : 'text-red-600'}`}>
                     {results.win_rate.toFixed(2)}%
                   </div>
                   <div className="text-sm text-gray-600">Win Rate</div>
                 </div>
               )}
               
-              {results.profit_factor && (
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">
-                    {results.profit_factor.toFixed(2)}
-                  </div>
-                  <div className="text-sm text-gray-600">Profit Factor</div>
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <div className="text-2xl font-bold text-black">
+                  {results.total_trades}
                 </div>
-              )}
+                <div className="text-sm text-gray-600">Total Trades</div>
+              </div>
+
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <div className="text-2xl font-bold text-black">
+                  {results.volatility_pct.toFixed(2)}%
+                </div>
+                <div className="text-sm text-gray-600">Volatility</div>
+              </div>
+
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <div className={`text-2xl font-bold ${results.total_return > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {results.total_return > 0 ? '+' : ''}{results.total_return.toFixed(2)}%
+                </div>
+                <div className="text-sm text-gray-600">Total Return</div>
+              </div>
+              
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <div className={`text-2xl font-bold ${results.sharpe_ratio > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {results.sharpe_ratio.toFixed(2)}
+                </div>
+                <div className="text-sm text-gray-600">Sharpe Ratio</div>
+              </div>
+              
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <div className={`text-2xl font-bold ${results.sortino_ratio > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {results.sortino_ratio.toFixed(2)}
+                </div>
+                <div className="text-sm text-gray-600">Sortino Ratio</div>
+              </div>
+              
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <div className={`text-2xl font-bold ${results.max_drawdown > -20 ? 'text-green-600' : 'text-red-600'}`}>
+                  {results.max_drawdown.toFixed(2)}%
+                </div>
+                <div className="text-sm text-gray-600">Max Drawdown</div>
+              </div>
             </div>
           </div>
         )}
@@ -286,17 +310,43 @@ const Index = () => {
             {/* Portfolio Value Chart */}
             <div className="bg-white p-6 rounded-lg shadow">
               <h2 className="text-xl font-semibold mb-4">Portfolio Value Over Time</h2>
-              <div className="h-80 bg-gray-100 rounded flex items-center justify-center">
-                <span className="text-gray-500">Portfolio value chart will appear here</span>
-              </div>
+              {visualizations.portfolio_value ? (
+                <Plot
+                  data={visualizations.portfolio_value.data}
+                  layout={{
+                    ...visualizations.portfolio_value.layout,
+                    autosize: true,
+                    height: 400,
+                  }}
+                  useResizeHandler={true}
+                  style={{ width: "100%", height: "400px" }}
+                />
+              ) : (
+                <div className="h-80 bg-gray-100 rounded flex items-center justify-center">
+                  <span className="text-gray-500">Portfolio value chart will appear here</span>
+                </div>
+              )}
             </div>
 
             {/* Price and Signals Chart */}
             <div className="bg-white p-6 rounded-lg shadow">
               <h2 className="text-xl font-semibold mb-4">Price Chart with Trading Signals</h2>
-              <div className="h-80 bg-gray-100 rounded flex items-center justify-center">
-                <span className="text-gray-500">Price chart with buy/sell signals will appear here</span>
-              </div>
+              {visualizations.price_and_signals ? (
+                <Plot
+                  data={visualizations.price_and_signals.data}
+                  layout={{
+                    ...visualizations.price_and_signals.layout,
+                    autosize: true,
+                    height: 400,
+                  }}
+                  useResizeHandler={true}
+                  style={{ width: "100%", height: "400px" }}
+                />
+              ) : (
+                <div className="h-80 bg-gray-100 rounded flex items-center justify-center">
+                  <span className="text-gray-500">Price chart with buy/sell signals will appear here</span>
+                </div>
+              )}
             </div>
           </>
         )}
