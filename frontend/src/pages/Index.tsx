@@ -484,9 +484,23 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold text-black-900 text-center mb-8">
-          QuantDash - Backtest Trading Strategies
-        </h1>
+        {/* Modern Professional Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 mb-6">
+            <img 
+              src="/logo.png" 
+              alt="QuantDash Logo" 
+              className="w-16 h-16 object-contain"
+            />
+          </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent mb-3">
+            QuantDash
+          </h1>
+          <p className="text-lg text-gray-600 font-medium">
+            Professional Algorithmic Trading Backtesting Platform
+          </p>
+          <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto mt-4 rounded-full"></div>
+        </div>
         
         {/* Parameters Section */}
         <div className="bg-white p-6 rounded-lg shadow">

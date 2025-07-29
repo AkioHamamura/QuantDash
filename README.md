@@ -1,105 +1,390 @@
-# QuantDash
+# QuantDash 📈
 
-An interactive web dashboard for backtesting algorithmic trading strategies and visualizing performance metrics.
+**Professional Algorithmic Trading Backtesting Platform**
 
-## 🎯 Goal
+A full-stack web application for backtesting algorithmic trading strategies with interactive visualizations and comprehensive performance analytics. Built with React frontend and FastAPI backend.
 
-Create an interactive web-dashboard that **back-tests algorithmic trading strategies** and visualizes key performance metrics (Sharpe, Sortino, equity-curve, drawdown).
+![QuantDash Logo](frontend/public/logo.png)
 
-## 🛠️ Core Stack
+## 🎯 Overview
 
-| Purpose | Tool |
-| --- | --- |
-| Data pull | `yfinance` |
-| Data wrangle | `pandas` |
-| Back-testing | `backtrader` |
-| Interactivity & plots | `Plotly Dash` |
-| Hosting | Streamlit Cloud **or** Render free tier |
-| Version control | GitHub |
+QuantDash provides a professional-grade platform for developing, testing, and analyzing algorithmic trading strategies. The platform features a modern web interface with real-time parameter adjustment, interactive charts, and detailed performance metrics.
 
-## 📁 Project Structure
+### Key Features
+- 🚀 **6 Pre-built Trading Strategies** - Ready-to-use algorithms with customizable parameters
+- 📊 **Interactive Visualizations** - Real-time charts with Plotly integration
+- 📈 **Comprehensive Analytics** - Sharpe ratio, Sortino ratio, max drawdown, win rate, and more
+- 🎛️ **Live Parameter Tuning** - Adjust strategy parameters in real-time
+- 📱 **Mobile Responsive** - Access from any device on your network
+- 🎨 **Professional UI** - Modern, clean interface with gradient designs
+- 🔄 **Real-time Data** - Live stock data integration with caching
+- 📋 **Ticker Autocomplete** - Smart ticker search with validation
+
+## 🏗️ Architecture
+
+### Tech Stack
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Frontend** | React + TypeScript + Vite | Modern web interface |
+| **Backend** | FastAPI + Python | High-performance API server |
+| **Data Processing** | Pandas + NumPy | Financial data manipulation |
+| **Data Source** | yfinance | Real-time stock data |
+| **Visualization** | Plotly.js | Interactive charts |
+| **Styling** | Tailwind CSS | Modern responsive design |
+| **Caching** | Parquet files | High-performance data storage |
+
+### Project Structure
 
 ```
 QuantDash/
-├── src/
-│   ├── strategies/          # Trading strategy implementations
-│   │   ├── ma_crossover.py      # Moving Average Crossover
-│   │   ├── rsi_pullback.py      # RSI Pullback
-│   │   ├── bollinger_breakout.py # Bollinger Band Breakout
-│   │   ├── dual_momentum.py     # Dual Momentum
-│   │   ├── gap_fade.py          # Gap Fade
-│   │   ├── pair_trading.py      # Pair Trading
-│   │   └── turtle_breakout.py   # Turtle Breakout
-│   ├── data/                # Data fetching and processing
-│   ├── backtesting/         # Backtesting engine and metrics
-│   ├── dashboard/           # Dash web application
-│   └── utils/               # Helper functions
-├── config/                  # Configuration files (YAML)
-├── data/                    # Historical price data (CSV)
-├── tests/                   # Unit tests
-├── docs/                    # Documentation
-├── requirements.txt         # Python dependencies
-└── .gitignore              # Git ignore rules
+├── backend/                          # Python FastAPI backend
+│   ├── src/
+│   │   ├── strategies/              # Trading strategy implementations
+│   │   │   ├── ma_crossover.py     # Moving Average Crossover
+│   │   │   ├── bollinger_breakout.py # Bollinger Band Breakout
+│   │   │   ├── dual_momentum.py    # Dual Momentum Strategy
+│   │   │   ├── gap_fade.py         # Gap Fade Strategy
+│   │   │   ├── rsi_pullback.py     # RSI Pullback Strategy
+│   │   │   └── turtle_breakout.py  # Turtle Breakout Strategy
+│   │   ├── backtesting/            # Backtesting engine
+│   │   │   ├── engine.py          # Main backtesting logic
+│   │   │   └── viz.py             # Visualization generation
+│   │   ├── data/                   # Data fetching and caching
+│   │   │   └── data_fetcher.py    # yfinance integration
+│   │   ├── api/                    # FastAPI server
+│   │   │   └── server.py          # API endpoints
+│   │   └── utils/                  # Helper utilities
+│   ├── cache/                      # Cached market data (Parquet)
+│   └── main.py                     # Backend entry point
+├── frontend/                        # React frontend
+│   ├── src/
+│   │   ├── pages/                  # React pages
+│   │   │   └── Index.tsx          # Main trading interface
+│   │   ├── services/               # API integration
+│   │   │   └── api.ts             # Backend communication
+│   │   └── components/             # Reusable components
+│   ├── public/
+│   │   └── logo.png               # QuantDash logo
+│   ├── package.json               # NPM dependencies
+│   └── vite.config.ts             # Vite configuration
+├── config/
+│   └── config.yaml                # Application configuration
+├── docs/                          # Documentation
+├── requirements.txt               # Python dependencies
+└── README.md                      # This file
 ```
 
-## 🚀 Five-Night Sprint Plan
+## 🚀 Quick Start
 
-| Night | Deliverable | Key Tasks |
-| --- | --- | --- |
-| **Mon** | **Project scaffold** | Setup virtualenv, install dependencies, fetch SPY data |
-| **Tue** | **Strategy & back-test** | Implement MA Crossover in backtrader, generate results |
-| **Wed** | **Dashboard v0** | Build Dash app with charts and KPI cards |
-| **Thu** | **Polish & docs** | Add controls, theme, write README + demo |
-| **Fri** | **Deploy & share** | Deploy to cloud, share on social media |
+### Prerequisites
+- Python 3.9+ with conda/pip
+- Node.js 18+ with npm
+- Git
 
-## 📊 Available Strategies
+### 1. Clone Repository
+```bash
+git clone https://github.com/jakobildstad/QuantDash.git
+cd QuantDash
+```
 
-1. **Moving Average Crossover** - Classic trend-following strategy
-2. **RSI Pullback** - Mean reversion with trend filter
-3. **Bollinger Band Breakout** - Volatility breakout strategy
-4. **Dual Momentum** - Absolute and relative momentum
-5. **Gap Fade** - Intraday mean reversion
-6. **Pair Trading** - Statistical arbitrage
-7. **Turtle Breakout** - Channel breakout system
+### 2. Backend Setup
+```bash
+# Navigate to backend
+cd backend
 
-## 🔧 Getting Started
+# Create conda environment (recommended)
+conda create -n quant python=3.9
+conda activate quant
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/jakobildstad/QuantDash.git
-   cd QuantDash
-   ```
+# Install dependencies
+pip install -r ../requirements.txt
 
-2. **Set up virtual environment**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+# Start backend server
+python src/api/server.py
+```
 
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+The backend will start on `http://localhost:8000`
 
-4. **Run the dashboard**
-   ```bash
-   python src/main.py
-   ```
+### 3. Frontend Setup
+```bash
+# Navigate to frontend (new terminal)
+cd frontend
 
-## 📈 Features
+# Install dependencies
+npm install
 
-- **Interactive Charts**: Price charts with technical indicators
-- **Strategy Comparison**: Run multiple strategies simultaneously
-- **Performance Metrics**: Sharpe ratio, Sortino ratio, max drawdown, etc.
-- **Customizable Parameters**: Adjust strategy parameters in real-time
-- **Data Export**: Download results and charts
+# Start development server
+npm run dev
+```
+
+The frontend will start on `http://localhost:5173`
+
+### 4. Access Application
+- **Local**: http://localhost:5173
+- **Network**: http://YOUR_IP:5173 (for mobile access)
+
+## 📊 Trading Strategies
+
+### 1. Moving Average Crossover
+**Strategy**: Buy when fast MA crosses above slow MA, sell when below
+- **Parameters**: Fast Period (5-50), Slow Period (10-100)
+- **Use Case**: Trend following in trending markets
+
+### 2. Bollinger Band Breakout
+**Strategy**: Trade breakouts above/below Bollinger Bands
+- **Parameters**: Period (10-50), Standard Deviation (1.0-3.0)
+- **Use Case**: Volatility breakouts and momentum trading
+
+### 3. Dual Momentum
+**Strategy**: Combine absolute and relative momentum signals
+- **Parameters**: Lookback Period (20-120), Risk-Free Rate (0-10%)
+- **Use Case**: Long-term trend following with risk management
+
+### 4. Gap Fade
+**Strategy**: Fade significant overnight gaps expecting mean reversion
+- **Parameters**: Gap Threshold (1-5%), Stop Loss (2-10%)
+- **Use Case**: Intraday mean reversion trading
+
+### 5. RSI Pullback
+**Strategy**: Buy oversold pullbacks in uptrends, sell overbought in downtrends
+- **Parameters**: RSI Period (7-30), MA Period (20-100), Oversold/Overbought levels
+- **Use Case**: Counter-trend trading with trend filter
+
+### 6. Turtle Breakout
+**Strategy**: Trade channel breakouts with ATR-based position sizing
+- **Parameters**: Entry Period (10-50), Exit Period (5-30), ATR Period (10-30), Risk %
+- **Use Case**: Systematic breakout trading with risk management
+
+## 📈 Performance Metrics
+
+QuantDash calculates comprehensive performance analytics:
+
+| Metric | Description | Interpretation |
+|--------|-------------|----------------|
+| **Total Return** | Overall percentage gain/loss | Higher is better |
+| **Sharpe Ratio** | Risk-adjusted return | > 1.0 is good, > 2.0 is excellent |
+| **Sortino Ratio** | Downside risk-adjusted return | Focuses on harmful volatility |
+| **Max Drawdown** | Largest peak-to-trough decline | Lower is better (< -20% concerning) |
+| **Volatility** | Annual price volatility | Strategy-dependent preference |
+| **Win Rate** | Percentage of profitable trades | > 50% preferred for most strategies |
+| **Total Trades** | Number of completed trades | Higher provides better statistics |
+
+## 🔧 Configuration
+
+### Environment Variables
+
+**Frontend** (`.env.local`):
+```bash
+# API endpoint
+VITE_API_BASE_URL=http://localhost:8000/api
+```
+
+**Backend Configuration** (`config/config.yaml`):
+```yaml
+data:
+  cache_dir: "cache"
+  default_period: "1y"
+  
+strategies:
+  default_initial_cash: 10000
+  
+api:
+  cors_origins:
+    - "http://localhost:5173"
+    - "http://10.0.0.116:5173"
+```
+
+### Customizing Strategies
+
+Add new strategies by:
+
+1. **Create strategy class** in `backend/src/strategies/`
+2. **Inherit from BaseStrategy**
+3. **Implement required methods**:
+   - `generate_signals(data)`
+   - `get_json_visualizations()`
+4. **Register in server.py**
+
+Example:
+```python
+class CustomStrategy(BaseStrategy):
+    def __init__(self, param1=10, initial_cash=10000):
+        super().__init__("Custom Strategy", initial_cash)
+        self.param1 = param1
+    
+    def generate_signals(self, data):
+        # Your strategy logic here
+        pass
+```
+
+## 🌐 Deployment
+
+### Local Network Access
+1. **Find your IP**: `ipconfig getifaddr en0` (macOS) or `ipconfig` (Windows)
+2. **Update environment**: Set `VITE_API_BASE_URL=http://YOUR_IP:8000/api`
+3. **Restart servers**
+4. **Access from mobile**: `http://YOUR_IP:5173`
+
+### Production Deployment (Render.com)
+
+#### Backend Deployment:
+1. **Create Web Service** on Render
+2. **Connect GitHub** repository
+3. **Set build command**: `pip install -r requirements.txt`
+4. **Set start command**: `cd backend && python src/api/server.py`
+5. **Add environment variables** as needed
+
+#### Frontend Deployment:
+1. **Create Static Site** on Render
+2. **Set build command**: `cd frontend && npm install && npm run build`
+3. **Set publish directory**: `frontend/dist`
+4. **Add environment variable**: `VITE_API_BASE_URL=https://your-backend.onrender.com/api`
+
+### Docker Deployment
+```dockerfile
+# Backend Dockerfile
+FROM python:3.9-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY backend/ .
+CMD ["python", "src/api/server.py"]
+```
 
 ## 🧪 Testing
 
+### Run Backend Tests
 ```bash
-pytest tests/
+cd backend
+python -m pytest tests/ -v
 ```
 
-## 📝 License
+### Run Frontend Tests
+```bash
+cd frontend
+npm test
+```
 
-This project is open source and available under the MIT License.
+### Manual Testing Checklist
+- [ ] All 6 strategies load without errors
+- [ ] Parameter changes update visualizations
+- [ ] Charts display correctly
+- [ ] Performance metrics calculate properly
+- [ ] Mobile access works on network
+- [ ] Ticker autocomplete functions
+- [ ] Error handling works
+
+## 🔍 API Documentation
+
+### Endpoints
+
+#### GET `/api/tickers`
+Returns list of available stock tickers
+```json
+{
+  "success": true,
+  "tickers": ["AAPL", "GOOGL", "MSFT", ...]
+}
+```
+
+#### GET `/api/strategies`
+Returns available strategies and parameters
+```json
+{
+  "success": true,
+  "strategies": {
+    "moving_average_crossover": {
+      "name": "Moving Average Crossover",
+      "parameters": {...}
+    }
+  }
+}
+```
+
+#### POST `/api/backtest`
+Run backtest with parameters
+```json
+{
+  "symbol": "AAPL",
+  "period": "1y",
+  "algorithm": "moving_average_crossover",
+  "initial_cash": 10000,
+  "algorithm_specific_params": {
+    "fast_period": 12,
+    "slow_period": 26
+  }
+}
+```
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**"Load failed" error**:
+- Check backend server is running on port 8000
+- Verify CORS settings allow your frontend URL
+- Confirm environment variables are set correctly
+
+**Charts not displaying**:
+- Check browser console for JavaScript errors
+- Verify Plotly.js is loaded correctly
+- Ensure visualization data is valid JSON
+
+**Mobile access not working**:
+- Confirm both devices on same WiFi
+- Update API URL to use IP address instead of localhost
+- Check firewall/router settings
+
+**Strategy errors**:
+- Verify all required Python packages installed
+- Check data availability for selected ticker
+- Validate strategy parameters are in valid ranges
+
+### Debug Mode
+Enable detailed logging:
+```bash
+# Backend
+export PYTHONPATH=$PYTHONPATH:./backend/src
+python -m pdb backend/src/api/server.py
+
+# Frontend
+npm run dev -- --debug
+```
+
+## � Contributing
+
+1. **Fork** the repository
+2. **Create** feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to branch (`git push origin feature/amazing-feature`)
+5. **Open** Pull Request
+
+### Development Guidelines
+- Follow PEP 8 for Python code
+- Use TypeScript for frontend development
+- Add tests for new features
+- Update documentation
+- Ensure mobile compatibility
+
+## � License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **yfinance** for financial data
+- **Plotly** for interactive visualizations
+- **FastAPI** for high-performance backend
+- **React** for modern frontend framework
+- **Tailwind CSS** for beautiful styling
+
+## 📞 Support
+
+- **Issues**: [GitHub Issues](https://github.com/jakobildstad/QuantDash/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/jakobildstad/QuantDash/discussions)
+- **Email**: Contact through GitHub profile
+
+---
+
+**Built with ❤️ for algorithmic traders and quantitative analysts**
