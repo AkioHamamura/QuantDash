@@ -23,8 +23,9 @@ print(f"Python path includes: {backend_path}")
 
 from backtesting.engine import BacktestEngine
 from strategies.ma_crossover import MovingAverageCrossover
-from data.data_fetcher import fetch_stock_data
+from data.data_fetcher import fetch_stock_data, fetch_cached_data
 from utils.helpers import make_json_serializable
+from utils.globals import DATA_PATH
 
 
 app = FastAPI()
@@ -39,11 +40,42 @@ app.add_middleware(
 )
 
 class BacktestRequest(BaseModel):
-    symbol: str
+    symbol: str  # Changed from 'ticker' to match frontend
     period: str = "1y"
     algorithm: str = "moving_average_crossover"
     initial_cash: Optional[int] = 10000
     algorithm_specific_params: Optional[Dict] = {}
+
+@app.get("/api/tickers")
+async def get_available_tickers():
+    """Get list of available stock tickers from cache"""
+    try:
+        tickers_file = os.path.join(DATA_PATH, "available_tickers_1d.txt")
+        if os.path.exists(tickers_file):
+            with open(tickers_file, 'r') as f:
+                tickers = [line.strip() for line in f.readlines() if line.strip()]
+            return {"success": True, "tickers": sorted(tickers)}
+        else:
+            return {"success": False, "error": "Tickers file not found"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+# Add middleware to log all requests
+@app.middleware("http")
+async def log_requests(request, call_next):
+    print(f"Incoming request: {request.method} {request.url}")
+    if request.method == "POST":
+        # Try to read the body for debugging
+        try:
+            body = await request.body()
+            print(f"Request body: {body.decode()}")
+        except Exception as e:
+            print(f"Could not read body: {e}")
+    
+    response = await call_next(request)
+    print(f"Response status: {response.status_code}")
+    return response
+
 
 @app.post("/api/backtest")
 async def run_backtest(request: BacktestRequest):
@@ -51,12 +83,26 @@ async def run_backtest(request: BacktestRequest):
         print(f"Received request: {request}")
         
         # Fetch data using your existing function
-        data = fetch_stock_data(request.symbol, period=request.period, use_cache=True)
+        print(f"Fetching cached data for {request.symbol}, period: {request.period}")
+        data = fetch_cached_data(request.symbol, period=request.period)
+        
+        # Debug data fetching
+        print(f"Data result: {type(data)}")
+        if data is not None:
+            print(f"Data shape: {data.shape}")
+            print(f"Data columns: {list(data.columns)}")
+            print(f"Data index type: {type(data.index)}")
+            print(f"Data not empty: {not data.empty}")
+        else:
+            print("Data is None")
+            
         if data is None or data.empty:
+            print("Failed to fetch data - returning error")
             return {"success": False, "error": "Failed to fetch data"}
         
         # Get algorithm parameters (support both old and new parameter names)
         params = request.algorithm_specific_params or {}
+        print(f"Algorithm params: {params}")
         
         # Initialize your strategy
         strategy = MovingAverageCrossover(
@@ -64,9 +110,11 @@ async def run_backtest(request: BacktestRequest):
             slow_period=params.get("slow_period", 26),
             initial_cash=request.initial_cash or 10000
         )
+        print(f"Strategy initialized: {strategy}")
         
         # Run backtest
         engine = BacktestEngine(strategy)
+        print("Running backtest...")
         results, viz = engine.run(data, visualize=True)
         
 

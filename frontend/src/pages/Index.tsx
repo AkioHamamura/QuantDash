@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { apiClient } from '@/services/api'; // Adjust the import path as necessary
 import Plot from 'react-plotly.js';
 
@@ -36,6 +36,73 @@ const Index = () => {
     price_and_signals?: any;
     portfolio_value?: any;
   }>({});
+
+  // Autocomplete state
+  const [availableTickers, setAvailableTickers] = useState<string[]>([]);
+  const [filteredTickers, setFilteredTickers] = useState<string[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Load available tickers on component mount
+  useEffect(() => {
+    const loadTickers = async () => {
+      const response = await apiClient.getAvailableTickers();
+      if (response.success && response.tickers) {
+        setAvailableTickers(response.tickers);
+      }
+    };
+    loadTickers();
+  }, []);
+
+  // Filter tickers based on input
+  useEffect(() => {
+    if (availableTickers.length > 0) {
+      if (symbol && symbol !== '') {
+        // Filter based on input
+        const filtered = availableTickers.filter(ticker => 
+          ticker.toLowerCase().includes(symbol.toLowerCase())
+        );
+        setFilteredTickers(filtered.slice(0, 20)); // Show more results when filtering
+        setShowDropdown(inputFocused && filtered.length > 0);
+      } else {
+        // Show all tickers when input is empty
+        setFilteredTickers(availableTickers); // Show ALL tickers
+        setShowDropdown(inputFocused);
+      }
+    } else {
+      setFilteredTickers([]);
+      setShowDropdown(false);
+    }
+  }, [symbol, availableTickers, inputFocused]);
+
+  // Handle clicking outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) &&
+          inputRef.current && !inputRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+        setInputFocused(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSymbolChange = (value: string) => {
+    // Only allow letters and convert to uppercase
+    const validSymbol = value.replace(/[^A-Za-z]/g, '').toUpperCase();
+    setSymbol(validSymbol);
+  };
+
+  const handleTickerSelect = (ticker: string) => {
+    setSymbol(ticker);
+    setShowDropdown(false);
+    setInputFocused(false);
+    inputRef.current?.blur();
+  };
 
   const algorithms = [
     { value: 'moving_average_crossover', label: 'Moving Average Crossover' },
@@ -161,18 +228,49 @@ const Index = () => {
           <h2 className="text-xl font-semibold mb-6">Parameters</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
+              <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Stock Symbol
                 </label>
                 <input
+                  ref={inputRef}
                   type="text"
                   value={symbol}
-                  onChange={(e) => setSymbol(e.target.value.toUpperCase())}
+                  onChange={(e) => handleSymbolChange(e.target.value)}
+                  onFocus={() => setInputFocused(true)}
                   placeholder="AAPL"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
+                
+                {/* Dropdown for autocomplete */}
+                {showDropdown && (
+                  <div 
+                    ref={dropdownRef}
+                    className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto"
+                  >
+                    {filteredTickers.map((ticker) => (
+                      <div
+                        key={ticker}
+                        onClick={() => handleTickerSelect(ticker)}
+                        className="px-3 py-2 cursor-pointer hover:bg-blue-50 hover:text-blue-600 transition-colors border-b border-gray-100 last:border-b-0"
+                      >
+                        {ticker}
+                      </div>
+                    ))}
+                    {filteredTickers.length === 0 && (
+                      <div className="px-3 py-2 text-gray-500 italic">
+                        No tickers available
+                      </div>
+                    )}
+                    {/* Show count of results */}
+                    {filteredTickers.length > 0 && (
+                      <div className="px-3 py-1 text-xs text-gray-500 bg-gray-50 border-t">
+                        {filteredTickers.length} ticker{filteredTickers.length !== 1 ? 's' : ''} available
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
               
               <div>
@@ -184,8 +282,11 @@ const Index = () => {
                   onChange={(e) => setPeriod(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 >
+                  <option value="6mo">6 Months</option>
                   <option value="1y">1 Year</option>
                   <option value="2y">2 Years</option>
+                  <option value="3y">3 Years</option>
+                  <option value="4y">4 Years</option>
                   <option value="5y">5 Years</option>
                   <option value="max">Max Available</option>
                 </select>
@@ -208,7 +309,7 @@ const Index = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Algorithm
+                Trading Algorithm
               </label>
               <select 
                 value={selectedAlgorithm}

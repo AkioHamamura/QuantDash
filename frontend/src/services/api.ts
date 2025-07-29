@@ -55,5 +55,23 @@ export const apiClient = {
       };
     }
   },
+
+  // Get available stock tickers
+  async getAvailableTickers(): Promise<{success: boolean; tickers?: string[]; error?: string}> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/tickers`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  },
   // Add more API methods as needed
 };

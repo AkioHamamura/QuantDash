@@ -16,9 +16,10 @@ class BaseStrategy(ABC):
     Subclasses must implement the generate_signals method and can override simulate_trading if needed.
     All attributes and methods here are guaranteed to be available in all trading strategies.
     """
-    
-    def __init__(self, initial_cash: float = 100000):
+
+    def __init__(self, name: str, initial_cash: float = 100000):
         """Initialize the strategy with portfolio state"""
+        self.name = name
         self.initial_cash = initial_cash
         
         # Portfolio state (will be reset for each backtest)

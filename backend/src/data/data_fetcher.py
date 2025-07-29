@@ -9,6 +9,86 @@ import os
 # Fix import path when running from different directories
 from utils.globals import DATA_PATH
 
+def write_available_tickers(cache_dir=DATA_PATH, interval="1d"):
+    """
+    Write available tickers (f"{ticker}_max_None_None_{interval}_data.parquet") to a text file for reference.
+    This function is useful for debugging and ensuring the ticker list is up-to-date.
+    """
+    with open(f"{cache_dir}/available_tickers_{interval}.txt", "w") as f:
+        for file in os.listdir(cache_dir):
+            if file.endswith(f"max_None_None_{interval}_data.parquet"):
+                ticker = file.split("_")[0]
+                f.write(f"{ticker}\n")
+
+
+def fetch_cached_data(ticker, period=None, start_date=None, end_date=None, interval="1d"):
+    """
+    Fetch cached data for a specific ticker and time range.
+
+    works for both single index and multi-index dataframes.
+    
+    Note: yfinance DataFrames can have MultiIndex columns structure like:
+    - Single ticker: Columns are ('Open', 'High', 'Low', 'Close', 'Volume')
+    - Multiple tickers: Columns are MultiIndex like (('Open', 'AAPL'), ('Close', 'AAPL'))
+    
+    Since we cache max data and filter by period, we handle potential MultiIndex by flattening.
+    """
+    cache_file = f"{DATA_PATH}/{ticker}_max_None_None_{interval}_data.parquet"
+    if not os.path.exists(cache_file):
+        return None
+        
+    data_df = pd.read_parquet(cache_file)
+    
+    # Handle MultiIndex columns - flatten them for easier access (from viz.py pattern)
+    if isinstance(data_df.columns, pd.MultiIndex):
+        # Flatten MultiIndex columns by taking the first level that's not empty
+        new_columns = []
+        for col in data_df.columns:
+            if isinstance(col, tuple):
+                # Take the first non-empty part of the tuple
+                new_col = col[0] if col[0] else col[1] if len(col) > 1 else str(col)
+            else:
+                new_col = col
+            new_columns.append(new_col)
+        data_df.columns = new_columns
+
+    if period is None and start_date is None and end_date is None:
+        # If no period or date range specified, return the entire cached data
+        return data_df
+    
+    if period is not None:
+        # If period is specified, filter the data from the last available date backwards
+        last_date = data_df.index.max()  # Get the most recent date in the dataset
+        
+        if period == "1mo":
+            return data_df[data_df.index >= last_date - pd.Timedelta(days=30)]
+        elif period == "6mo":
+            return data_df[data_df.index >= last_date - pd.Timedelta(days=180)]
+        elif period == "1y":
+            return data_df[data_df.index >= last_date - pd.Timedelta(days=365)]
+        elif period == "2y":
+            return data_df[data_df.index >= last_date - pd.Timedelta(days=2*365)]
+        elif period == "3y":
+            return data_df[data_df.index >= last_date - pd.Timedelta(days=3*365)]
+        elif period == "4y":
+            return data_df[data_df.index >= last_date - pd.Timedelta(days=4*365)]
+        elif period == "5y":
+            return data_df[data_df.index >= last_date - pd.Timedelta(days=5*365)]
+        elif period == "max":
+            return data_df
+    
+    # Handle start_date and end_date filtering if provided
+    if start_date is not None or end_date is not None:
+        if start_date:
+            data_df = data_df[data_df.index >= pd.to_datetime(start_date)]
+        if end_date:
+            data_df = data_df[data_df.index <= pd.to_datetime(end_date)]
+        return data_df
+    
+    return data_df
+
+
+
 def fetch_stock_data(ticker,
                      *, 
                      start_date=None, 
@@ -59,6 +139,10 @@ def fetch_stock_data(ticker,
     # Check for cached data first (if use_cache=True and not force_refresh)
     if use_cache and not force_refresh:
         print("Checking for cached data...")
+        print(f"Looking for cache files at: {DATA_PATH}")
+        print(f"Parquet cache file: {parquet_cache_file}")
+        print(f"CSV cache file: {csv_cache_file}")
+        
         # Check for parquet cache first (faster)
         if os.path.exists(parquet_cache_file):
             try:
@@ -82,6 +166,8 @@ def fetch_stock_data(ticker,
                 return data
             except Exception as e:
                 print(f"Error loading CSV cache: {e}")
+        else:
+            print(f"No cache files found at expected locations")
     
     # No cache found or force_refresh=True, fetch fresh data
     print(f"Fetching fresh data for {ticker} from Yahoo Finance...")

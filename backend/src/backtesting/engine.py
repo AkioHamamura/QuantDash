@@ -1,12 +1,12 @@
 # Main backtesting engine using backtrader
 
 import pandas as pd
-import numpy as np
-from typing import Dict, List, Tuple, Optional, Type
-from datetime import datetime
-from dataclasses import dataclass
-from abc import ABC, abstractmethod
-from backtesting.types import Trade
+import sys
+import os
+
+# Add the src directory to Python path for imports
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
 from strategies.base_strategy_class import BaseStrategy # Abstract Base Class import
 
 

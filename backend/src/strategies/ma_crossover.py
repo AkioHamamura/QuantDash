@@ -41,7 +41,7 @@ class MovingAverageCrossover(BaseStrategy):
             slow_period: Period for slow moving average (e.g., 30 days)
             initial_cash: Starting capital
         """
-        super().__init__(initial_cash=initial_cash)  # Call parent constructor with initial_cash
+        super().__init__(name="Moving Average Crossover", initial_cash=initial_cash)  # Call parent constructor with initial_cash
         self.fast_period = fast_period
         self.slow_period = slow_period
         
@@ -231,8 +231,8 @@ class MovingAverageCrossover(BaseStrategy):
                 )
 
         fig_price.update_layout(
-            title="Stock Price & Trading Signals",
-            xaxis_title="Date",
+            title=None,
+            xaxis_title=None,
             yaxis_title="Price ($)",
             legend_orientation="h",
             template="plotly_white",
@@ -264,12 +264,14 @@ class MovingAverageCrossover(BaseStrategy):
             )
 
         fig_port.update_layout(
-            title="Portfolio Value Over Time",
-            xaxis_title="Date",
+            title=None,
+            xaxis_title=None,
             yaxis_title="Portfolio Value ($)",
+            legend_orientation="h",
             template="plotly_white",
             margin=dict(l=40, r=20, t=35, b=35),
-            showlegend=True
+            showlegend=True,
+            hovermode='x unified'
         )
 
         # ── Serialise for painless frontend consumption ─────────────────────────
