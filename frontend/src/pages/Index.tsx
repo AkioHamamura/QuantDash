@@ -52,11 +52,6 @@ const Index = () => {
   const [tbAtrPeriod, setTbAtrPeriod] = useState(20);
   const [tbRiskPercent, setTbRiskPercent] = useState(0.02);
   
-  // Pair Trading Parameters
-  const [ptLookbackPeriod, setPtLookbackPeriod] = useState(60);
-  const [ptEntryThreshold, setPtEntryThreshold] = useState(2.0);
-  const [ptExitThreshold, setPtExitThreshold] = useState(0.5);
-  
   const [results, setResults] = useState<BacktestResults | null>(null);
   const [loading, setLoading] = useState(false);
   
@@ -140,7 +135,6 @@ const Index = () => {
     { value: 'gap_fade', label: 'Gap Fade' },
     { value: 'rsi_pullback', label: 'RSI Pullback' },
     { value: 'turtle_breakout', label: 'Turtle Breakout' },
-    { value: 'pair_trading', label: 'Pair Trading' },
   ];
 
   const renderAlgorithmParameters = () => {
@@ -388,52 +382,6 @@ const Index = () => {
             </div>
           </>
         );
-      case 'pair_trading':
-        return (
-          <>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Lookback Period
-              </label>
-              <input
-                type="number"
-                value={ptLookbackPeriod}
-                onChange={(e) => setPtLookbackPeriod(Number(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                min="30"
-                max="120"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Entry Threshold
-              </label>
-              <input
-                type="number"
-                value={ptEntryThreshold}
-                onChange={(e) => setPtEntryThreshold(Number(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                min="1.5"
-                max="3.0"
-                step="0.1"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Exit Threshold
-              </label>
-              <input
-                type="number"
-                value={ptExitThreshold}
-                onChange={(e) => setPtExitThreshold(Number(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                min="0.1"
-                max="1.0"
-                step="0.1"
-              />
-            </div>
-          </>
-        );
       default:
         return null;
     }
@@ -462,12 +410,6 @@ const Index = () => {
           exit_period: tbExitPeriod, 
           atr_period: tbAtrPeriod, 
           risk_percent: tbRiskPercent 
-        };
-      case 'pair_trading':
-        return { 
-          lookback_period: ptLookbackPeriod, 
-          entry_threshold: ptEntryThreshold, 
-          exit_threshold: ptExitThreshold 
         };
       default:
         return { fast_period: fastPeriod, slow_period: slowPeriod };

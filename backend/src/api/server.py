@@ -28,7 +28,6 @@ from strategies.dual_momentum import DualMomentum
 from strategies.gap_fade import GapFade
 from strategies.rsi_pullback import RSIPullback
 from strategies.turtle_breakout import TurtleBreakout
-from strategies.pair_trading import PairTrading
 from data.data_fetcher import fetch_stock_data, fetch_cached_data
 from utils.helpers import make_json_serializable
 from utils.globals import DATA_PATH
@@ -121,15 +120,6 @@ async def get_available_strategies():
                 "atr_period": {"type": "number", "default": 20, "min": 10, "max": 30, "description": "ATR calculation period"},
                 "risk_percent": {"type": "number", "default": 0.02, "min": 0.01, "max": 0.05, "step": 0.01, "description": "Risk per trade (%)"}
             }
-        },
-        "pair_trading": {
-            "name": "Pair Trading",
-            "description": "Statistical arbitrage based on Z-score mean reversion",
-            "parameters": {
-                "lookback_period": {"type": "number", "default": 60, "min": 30, "max": 120, "description": "Lookback period for statistics"},
-                "entry_threshold": {"type": "number", "default": 2.0, "min": 1.5, "max": 3.0, "step": 0.1, "description": "Z-score entry threshold"},
-                "exit_threshold": {"type": "number", "default": 0.5, "min": 0.1, "max": 1.0, "step": 0.1, "description": "Z-score exit threshold"}
-            }
         }
     }
     
@@ -220,13 +210,6 @@ async def run_backtest(request: BacktestRequest):
                 exit_period=params.get("exit_period", 10),
                 atr_period=params.get("atr_period", 20),
                 risk_percent=params.get("risk_percent", 0.02),
-                initial_cash=initial_cash
-            )
-        elif request.algorithm == "pair_trading":
-            strategy = PairTrading(
-                lookback_period=params.get("lookback_period", 60),
-                entry_threshold=params.get("entry_threshold", 2.0),
-                exit_threshold=params.get("exit_threshold", 0.5),
                 initial_cash=initial_cash
             )
         else:

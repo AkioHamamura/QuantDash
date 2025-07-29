@@ -7,7 +7,6 @@ from .dual_momentum import DualMomentum
 from .gap_fade import GapFade
 from .rsi_pullback import RSIPullback
 from .turtle_breakout import TurtleBreakout
-from .pair_trading import PairTrading
 
 __all__ = [
     'BaseStrategy',
@@ -16,6 +15,5 @@ __all__ = [
     'DualMomentum',
     'GapFade',
     'RSIPullback',
-    'TurtleBreakout',
-    'PairTrading'
+    'TurtleBreakout'
 ]
