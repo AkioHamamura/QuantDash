@@ -545,7 +545,14 @@ const Index = () => {
                 <select 
                   value={period}
                   onChange={(e) => setPeriod(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none cursor-pointer"
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
+                    backgroundPosition: 'right 8px center',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: '16px 16px',
+                    paddingRight: '32px'
+                  }}
                 >
                   <option value="6mo">6 Months</option>
                   <option value="1y">1 Year</option>
@@ -561,14 +568,19 @@ const Index = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Initial Cash
                 </label>
-                <input
-                  type="number"
-                  value={initialCash}
-                  onChange={(e) => setInitialCash(Number(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  min="1000"
-                  step="1000"
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span className="text-gray-500 text-sm">$</span>
+                  </div>
+                  <input
+                    type="number"
+                    value={initialCash}
+                    onChange={(e) => setInitialCash(Number(e.target.value))}
+                    className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    min="1000"
+                    step="1000"
+                  />
+                </div>
               </div>
             </div>
 
@@ -579,7 +591,14 @@ const Index = () => {
               <select 
                 value={selectedAlgorithm}
                 onChange={(e) => setSelectedAlgorithm(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none cursor-pointer"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
+                  backgroundPosition: 'right 8px center',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundSize: '16px 16px',
+                  paddingRight: '32px'
+                }}
               >
                 {algorithms.map((algo) => (
                   <option key={algo.value} value={algo.value}>
