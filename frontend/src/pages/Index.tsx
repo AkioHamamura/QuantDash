@@ -28,6 +28,35 @@ const Index = () => {
   const [fastPeriod, setFastPeriod] = useState(12);
   const [slowPeriod, setSlowPeriod] = useState(26);
   
+  // Bollinger Band Breakout Parameters
+  const [bbPeriod, setBbPeriod] = useState(20);
+  const [bbStdDev, setBbStdDev] = useState(2.0);
+  
+  // Dual Momentum Parameters
+  const [dmLookbackPeriod, setDmLookbackPeriod] = useState(60);
+  const [dmRiskFreeRate, setDmRiskFreeRate] = useState(0.02);
+  
+  // Gap Fade Parameters
+  const [gfGapThreshold, setGfGapThreshold] = useState(0.02);
+  const [gfStopLoss, setGfStopLoss] = useState(0.05);
+  
+  // RSI Pullback Parameters
+  const [rsiPeriod, setRsiPeriod] = useState(14);
+  const [rsiMaPeriod, setRsiMaPeriod] = useState(50);
+  const [rsiOversold, setRsiOversold] = useState(30);
+  const [rsiOverbought, setRsiOverbought] = useState(70);
+  
+  // Turtle Breakout Parameters
+  const [tbEntryPeriod, setTbEntryPeriod] = useState(20);
+  const [tbExitPeriod, setTbExitPeriod] = useState(10);
+  const [tbAtrPeriod, setTbAtrPeriod] = useState(20);
+  const [tbRiskPercent, setTbRiskPercent] = useState(0.02);
+  
+  // Pair Trading Parameters
+  const [ptLookbackPeriod, setPtLookbackPeriod] = useState(60);
+  const [ptEntryThreshold, setPtEntryThreshold] = useState(2.0);
+  const [ptExitThreshold, setPtExitThreshold] = useState(0.5);
+  
   const [results, setResults] = useState<BacktestResults | null>(null);
   const [loading, setLoading] = useState(false);
   
@@ -106,7 +135,12 @@ const Index = () => {
 
   const algorithms = [
     { value: 'moving_average_crossover', label: 'Moving Average Crossover' },
-    // Add more algorithms here as they become available
+    { value: 'bollinger_breakout', label: 'Bollinger Band Breakout' },
+    { value: 'dual_momentum', label: 'Dual Momentum' },
+    { value: 'gap_fade', label: 'Gap Fade' },
+    { value: 'rsi_pullback', label: 'RSI Pullback' },
+    { value: 'turtle_breakout', label: 'Turtle Breakout' },
+    { value: 'pair_trading', label: 'Pair Trading' },
   ];
 
   const renderAlgorithmParameters = () => {
@@ -123,7 +157,7 @@ const Index = () => {
                 value={fastPeriod}
                 onChange={(e) => setFastPeriod(Number(e.target.value))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                min="1"
+                min="5"
                 max="50"
               />
             </div>
@@ -136,8 +170,266 @@ const Index = () => {
                 value={slowPeriod}
                 onChange={(e) => setSlowPeriod(Number(e.target.value))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                min="1"
-                max="200"
+                min="10"
+                max="100"
+              />
+            </div>
+          </>
+        );
+      case 'bollinger_breakout':
+        return (
+          <>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Period
+              </label>
+              <input
+                type="number"
+                value={bbPeriod}
+                onChange={(e) => setBbPeriod(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                min="10"
+                max="50"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Standard Deviation Multiplier
+              </label>
+              <input
+                type="number"
+                value={bbStdDev}
+                onChange={(e) => setBbStdDev(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                min="1.0"
+                max="3.0"
+                step="0.1"
+              />
+            </div>
+          </>
+        );
+      case 'dual_momentum':
+        return (
+          <>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Lookback Period
+              </label>
+              <input
+                type="number"
+                value={dmLookbackPeriod}
+                onChange={(e) => setDmLookbackPeriod(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                min="20"
+                max="120"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Risk-Free Rate
+              </label>
+              <input
+                type="number"
+                value={dmRiskFreeRate}
+                onChange={(e) => setDmRiskFreeRate(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                min="0.0"
+                max="0.1"
+                step="0.01"
+              />
+            </div>
+          </>
+        );
+      case 'gap_fade':
+        return (
+          <>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Gap Threshold (%)
+              </label>
+              <input
+                type="number"
+                value={gfGapThreshold}
+                onChange={(e) => setGfGapThreshold(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                min="0.01"
+                max="0.05"
+                step="0.01"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Stop Loss (%)
+              </label>
+              <input
+                type="number"
+                value={gfStopLoss}
+                onChange={(e) => setGfStopLoss(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                min="0.02"
+                max="0.1"
+                step="0.01"
+              />
+            </div>
+          </>
+        );
+      case 'rsi_pullback':
+        return (
+          <>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                RSI Period
+              </label>
+              <input
+                type="number"
+                value={rsiPeriod}
+                onChange={(e) => setRsiPeriod(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                min="7"
+                max="30"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Moving Average Period
+              </label>
+              <input
+                type="number"
+                value={rsiMaPeriod}
+                onChange={(e) => setRsiMaPeriod(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                min="20"
+                max="100"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Oversold Threshold
+              </label>
+              <input
+                type="number"
+                value={rsiOversold}
+                onChange={(e) => setRsiOversold(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                min="20"
+                max="40"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Overbought Threshold
+              </label>
+              <input
+                type="number"
+                value={rsiOverbought}
+                onChange={(e) => setRsiOverbought(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                min="60"
+                max="80"
+              />
+            </div>
+          </>
+        );
+      case 'turtle_breakout':
+        return (
+          <>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Entry Period
+              </label>
+              <input
+                type="number"
+                value={tbEntryPeriod}
+                onChange={(e) => setTbEntryPeriod(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                min="10"
+                max="50"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Exit Period
+              </label>
+              <input
+                type="number"
+                value={tbExitPeriod}
+                onChange={(e) => setTbExitPeriod(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                min="5"
+                max="30"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                ATR Period
+              </label>
+              <input
+                type="number"
+                value={tbAtrPeriod}
+                onChange={(e) => setTbAtrPeriod(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                min="10"
+                max="30"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Risk Percent (%)
+              </label>
+              <input
+                type="number"
+                value={tbRiskPercent}
+                onChange={(e) => setTbRiskPercent(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                min="0.01"
+                max="0.05"
+                step="0.01"
+              />
+            </div>
+          </>
+        );
+      case 'pair_trading':
+        return (
+          <>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Lookback Period
+              </label>
+              <input
+                type="number"
+                value={ptLookbackPeriod}
+                onChange={(e) => setPtLookbackPeriod(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                min="30"
+                max="120"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Entry Threshold
+              </label>
+              <input
+                type="number"
+                value={ptEntryThreshold}
+                onChange={(e) => setPtEntryThreshold(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                min="1.5"
+                max="3.0"
+                step="0.1"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Exit Threshold
+              </label>
+              <input
+                type="number"
+                value={ptExitThreshold}
+                onChange={(e) => setPtExitThreshold(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                min="0.1"
+                max="1.0"
+                step="0.1"
               />
             </div>
           </>
@@ -147,21 +439,55 @@ const Index = () => {
     }
   };
 
+  const getAlgorithmParams = () => {
+    switch (selectedAlgorithm) {
+      case 'moving_average_crossover':
+        return { fast_period: fastPeriod, slow_period: slowPeriod };
+      case 'bollinger_breakout':
+        return { period: bbPeriod, std_dev: bbStdDev };
+      case 'dual_momentum':
+        return { lookback_period: dmLookbackPeriod, risk_free_rate: dmRiskFreeRate };
+      case 'gap_fade':
+        return { gap_threshold: gfGapThreshold, stop_loss: gfStopLoss };
+      case 'rsi_pullback':
+        return { 
+          rsi_period: rsiPeriod, 
+          ma_period: rsiMaPeriod, 
+          oversold: rsiOversold, 
+          overbought: rsiOverbought 
+        };
+      case 'turtle_breakout':
+        return { 
+          entry_period: tbEntryPeriod, 
+          exit_period: tbExitPeriod, 
+          atr_period: tbAtrPeriod, 
+          risk_percent: tbRiskPercent 
+        };
+      case 'pair_trading':
+        return { 
+          lookback_period: ptLookbackPeriod, 
+          entry_threshold: ptEntryThreshold, 
+          exit_threshold: ptExitThreshold 
+        };
+      default:
+        return { fast_period: fastPeriod, slow_period: slowPeriod };
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     try {
+      const algorithmParams = getAlgorithmParams();
+      
       // API call would go here
       console.log('Running backtest with:', {
         symbol,
         period,
         algorithm: selectedAlgorithm,
         initial_cash: initialCash,
-        algorithm_specific_params: {
-          fast_period: fastPeriod,
-          slow_period: slowPeriod,
-        }
+        algorithm_specific_params: algorithmParams
       });
 
       const result = await apiClient.runBacktest({ // Sends POST request to backend
@@ -170,10 +496,7 @@ const Index = () => {
         period: period,
         algorithm: selectedAlgorithm,
         initial_cash: initialCash,
-        algorithm_specific_params: {
-          fast_period: fastPeriod,
-          slow_period: slowPeriod,
-        }
+        algorithm_specific_params: algorithmParams
       });
   
   // THE VALUES END UP HERE in 'result':
@@ -183,7 +506,7 @@ const Index = () => {
     if (result.success) {
       setResults({
         strategy: selectedAlgorithm,
-        parameters: { fast_period: fastPeriod, slow_period: slowPeriod },
+        parameters: algorithmParams,
         total_return: result.data.total_return || 0,
         final_value: result.data.final_value || initialCash,
         sharpe_ratio: result.data.sharpe_ratio || 0, 

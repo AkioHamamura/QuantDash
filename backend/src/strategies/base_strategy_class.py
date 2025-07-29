@@ -127,6 +127,7 @@ class BaseStrategy(ABC):
         """
         raise NotImplementedError("Subclasses must implement visualize_results method")
     
+    @abstractmethod
     def get_json_visualizations(self, results: Dict) -> Dict[str, Any]:
         """
         Build two Plotly charts (JSON-serialised) from the `results` structure your
