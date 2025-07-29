@@ -1,0 +1,30 @@
+services:
+  # Backend API Service
+  - type: web
+    name: quantdash-backend
+    env: python
+    plan: free
+    buildCommand: |
+      cd backend &&
+      pip install --upgrade pip &&
+      pip install -r ../requirements.txt
+    startCommand: cd backend && python src/api/server.py
+    envVars:
+      - key: PYTHONPATH
+        value: /opt/render/project/src/backend/src
+      - key: PORT
+        value: 8000
+    
+  # Frontend Static Site
+  - type: web
+    name: quantdash-frontend
+    env: static
+    plan: free
+    buildCommand: |
+      cd frontend &&
+      npm ci &&
+      npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://quantdash-backend.onrender.com/api

@@ -33,14 +33,27 @@ from utils.helpers import make_json_serializable
 from utils.globals import DATA_PATH
 
 
-app = FastAPI()
+app = FastAPI(title="QuantDash API", version="1.0.0")
+
+@app.get("/")
+async def root():
+    """Health check endpoint"""
+    return {"message": "QuantDash API is running", "status": "healthy"}
+
+@app.get("/health")
+async def health_check():
+    """Health check for monitoring"""
+    return {"status": "healthy", "service": "quantdash-backend"}
 
 # Enable CORS for frontend communication
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",  # Frontend URL
-        "http://10.0.0.116:5173"   # Network access for mobile
+        "http://localhost:5173",  # Local development
+        "http://10.0.0.116:5173", # Network access for mobile
+        "https://quantdash-frontend.onrender.com",  # Production frontend
+        "https://*.onrender.com",  # Allow all Render subdomains
+        "*"  # Allow all origins for development (remove in production if needed)
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -296,4 +309,6 @@ async def run_backtest(request: BacktestRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # Use PORT environment variable for Render deployment
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
