@@ -70,7 +70,6 @@ logs/
 # Data files
 *.csv
 *.xlsx
-*.json
 data/*.csv
 !data/.gitkeep
 .data/*.parquet
