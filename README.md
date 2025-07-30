@@ -4,7 +4,7 @@
 
 A full-stack web application for backtesting algorithmic trading strategies with interactive visualizations and comprehensive performance analytics. Built with React frontend and FastAPI backend.
 
-🚀 **[Live website: https://quantdash-frontend.onrender.com](https://quantdash-frontend.onrender.com)** 
+🚀 **[Live website: https://quantdash-playground.onrender.com](https://quantdash-playground.onrender.com)** 
 PS! Website may take some time to boot up after inactivity as a result of using the free tier on Render.com
 
 ![QuantDash Logo](frontend/public/logo.png)
