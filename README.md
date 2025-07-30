@@ -4,6 +4,9 @@
 
 A full-stack web application for backtesting algorithmic trading strategies with interactive visualizations and comprehensive performance analytics. Built with React frontend and FastAPI backend.
 
+🚀 **[Live website: https://quantdash-frontend.onrender.com](https://quantdash-frontend.onrender.com)** 
+PS! Website may take some time to boot up after inactivity as a result of using the free tier on Render.com
+
 ![QuantDash Logo](frontend/public/logo.png)
 
 ## 🎯 Overview
@@ -121,6 +124,7 @@ npm run dev
 The frontend will start on `http://localhost:5173`
 
 ### 4. Access Application
+- **Live Demo**: https://quantdash-frontend.onrender.com (Production deployment)
 - **Local**: http://localhost:5173
 - **Network**: http://YOUR_IP:5173 (for mobile access)
 
@@ -227,6 +231,8 @@ class CustomStrategy(BaseStrategy):
 4. **Access from mobile**: `http://YOUR_IP:5173`
 
 ### Production Deployment (Render.com)
+
+**Live Application**: [https://quantdash-frontend.onrender.com](https://quantdash-frontend.onrender.com)
 
 #### Backend Deployment:
 1. **Create Web Service** on Render
