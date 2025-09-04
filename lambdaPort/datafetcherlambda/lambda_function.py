@@ -10,6 +10,7 @@ Purpose of this lambda function:
 - Simply call the yfinance library to fetch stock data then return it
 - Needs a symbol as input parameter
 - Example: POST Body: {"symbol": "NVDA"}
+- Build with: docker buildx build --platform linux/amd64 --provenance=false -t docker-image:quantdash-datafetcher .
 """
 def handler(event, context):
     symbol = event['symbol']
