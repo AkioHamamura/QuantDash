@@ -13,7 +13,10 @@ COPY . ${FUNCTION_DIR}
 # Install the function's dependencies
 RUN pip install \
     --target ${FUNCTION_DIR} \
-        awslambdaric
+        awslambdaric \
+    && pip install --target ${FUNCTION_DIR} -r ${FUNCTION_DIR}/requirements.txt
+
+
 
 # Use a slim version of the base Python image to reduce the final image size
 FROM python:3.12-slim

@@ -4,6 +4,7 @@ import pandas as pd
 import sys
 import yfinance as yf
 import time
+import boto3
 
 """
 Purpose of this lambda function:
@@ -13,13 +14,38 @@ Purpose of this lambda function:
 - Build with: docker buildx build --platform linux/amd64 --provenance=false -t docker-image:quantdash-datafetcher .
 """
 def handler(event, context):
-    symbol = event['symbol']
+    if 'symbol' in event:
+        symbol = event['symbol']
+    else:
+        symbol = "NVDA"
     data = fetch_stock_data(symbol)
+    test(data)
     return {
         'statusCode': 200,
         'body': data.to_json()
     }
 
+def test(data):
+    #Just try to put the data as a csv to the s3 bucket
+    s3_client = boto3.client('s3')
+    # Define bucket and key
+    bucket_name = 'quant-dash-cache'
+    object_key = 'test.csv'
+
+    # Content to upload
+    file_content = data.to_csv()
+
+    try:
+        # Upload the object
+        response = s3_client.put_object(
+            Body=file_content,
+            Bucket=bucket_name,
+            Key=object_key
+        )
+        print(f"Object '{object_key}' uploaded successfully to bucket '{bucket_name}'.")
+        print(f"Response: {response}")
+    except Exception as e:
+        print(f"Error uploading object: {e}")
 
 def fetch_stock_data(ticker="NVDA",
                      *,

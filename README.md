@@ -104,7 +104,7 @@ conda activate quant
 pip install -r ../requirements.txt
 
 # Start backend server
-python src/api/server.py
+python src/controller/server.py
 ```
 
 The backend will start on `http://localhost:8000`
@@ -352,7 +352,7 @@ Enable detailed logging:
 ```bash
 # Backend
 export PYTHONPATH=$PYTHONPATH:./backend/src
-python -m pdb backend/src/api/server.py
+python -m pdb backend/src/controller/server.py
 
 # Frontend
 npm run dev -- --debug

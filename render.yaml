@@ -8,7 +8,7 @@ services:
       cd backend &&
       pip install --upgrade pip &&
       pip install -r ../requirements.txt
-    startCommand: cd backend && python src/api/server.py
+    startCommand: cd backend && python src/controller/server.py
     envVars:
       - key: PYTHONPATH
         value: /opt/render/project/src/backend/src

@@ -115,7 +115,7 @@ VITE_API_BASE_URL=https://quantdash-backend.onrender.com/api
 ### 1. Local Production Test:
 ```bash
 # Test backend
-cd backend && python src/api/server.py
+cd backend && python src/controller/server.py
 
 # Test frontend build
 cd frontend && npm run build && npm run preview

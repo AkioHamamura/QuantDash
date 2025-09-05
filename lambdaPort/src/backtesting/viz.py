@@ -1,6 +1,3 @@
-
-
-
 def visualize_results(results):
     """
     Visualizes the results of a backtest using Plotly for interactive charts.

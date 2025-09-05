@@ -7,7 +7,7 @@ import os
 # Add the src directory to Python path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from strategies.base_strategy_class import BaseStrategy # Abstract Base Class import
+from ..strategies.base_strategy_class import BaseStrategy # Abstract Base Class import
 
 
 class BacktestEngine:

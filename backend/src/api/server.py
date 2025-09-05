@@ -67,7 +67,7 @@ class BacktestRequest(BaseModel):
     initial_cash: Optional[int] = 10000
     algorithm_specific_params: Optional[Dict] = {}
 
-@app.get("/api/tickers")
+@app.get("/controller/tickers")
 async def get_available_tickers():
     """Get list of available stock tickers from cache"""
     try:
@@ -81,7 +81,7 @@ async def get_available_tickers():
     except Exception as e:
         return {"success": False, "error": str(e)}
 
-@app.get("/api/strategies")
+@app.get("/controller/strategies")
 async def get_available_strategies():
     """Get list of available trading strategies with their parameters"""
     strategies = {
@@ -158,7 +158,7 @@ async def log_requests(request, call_next):
     return response
 
 
-@app.post("/api/backtest")
+@app.post("/controller/backtest")
 async def run_backtest(request: BacktestRequest):
     try:
         print(f"Received request: {request}")

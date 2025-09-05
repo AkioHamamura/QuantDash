@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from typing import Any, Dict, List, Tuple, Optional, Type
 from abc import ABC, abstractmethod # Abstract Base Class import
-from backtesting.types import Trade
+from ..backtesting.types import Trade
 
 
 class BaseStrategy(ABC):
@@ -54,7 +54,7 @@ class BaseStrategy(ABC):
             self.position = 1
             
             # Record trade entry
-            from utils.helpers import convert_date_to_datetime
+            from ..utils.helpers import convert_date_to_datetime
             date_obj = convert_date_to_datetime(date)
             trade = Trade(
                 entry_date=date_obj,
@@ -76,7 +76,7 @@ class BaseStrategy(ABC):
             # Complete the last trade record
             if self.trades:
                 last_trade = self.trades[-1]
-                from utils.helpers import convert_date_to_datetime
+                from ..utils.helpers import convert_date_to_datetime
                 date_obj = convert_date_to_datetime(date)
                 last_trade.exit_date = date_obj
                 last_trade.exit_price = current_price
@@ -192,7 +192,7 @@ class BaseStrategy(ABC):
         
         Should be overridden by subclasses to provide strategy-specific metrics.
         """
-        from backtesting.metrics import calculate_comprehensive_metrics
+        from ..backtesting.metrics import calculate_comprehensive_metrics
         
         # Get completed trades
         completed_trades = [t for t in self.trades if t.exit_date is not None]

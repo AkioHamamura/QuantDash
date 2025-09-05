@@ -1,6 +1,3 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 from typing import Dict, Optional
 import pandas as pd
 import sys
@@ -21,44 +18,43 @@ if backend_path not in sys.path:
 print(f"Python path includes: {backend_src_path}")
 print(f"Python path includes: {backend_path}")
 
-from backtesting.engine import BacktestEngine
-from strategies.ma_crossover import MovingAverageCrossover
-from strategies.bollinger_breakout import BollingerBreakout
-from strategies.dual_momentum import DualMomentum
-from strategies.gap_fade import GapFade
-from strategies.rsi_pullback import RSIPullback
-from strategies.turtle_breakout import TurtleBreakout
-from data.data_fetcher import fetch_stock_data, fetch_cached_data
-from utils.helpers import make_json_serializable
-from utils.globals import DATA_PATH
+from ..backtesting.engine import BacktestEngine
+from ..strategies.ma_crossover import MovingAverageCrossover
+from ..strategies.bollinger_breakout import BollingerBreakout
+from ..strategies.dual_momentum import DualMomentum
+from ..strategies.gap_fade import GapFade
+from ..strategies.rsi_pullback import RSIPullback
+from ..strategies.turtle_breakout import TurtleBreakout
+from ..data.data_fetcher import fetch_stock_data, fetch_cached_data
+from ..utils.helpers import make_json_serializable
+from ..utils.globals import DATA_PATH
 
-
-app = FastAPI(title="QuantDash API", version="1.0.0")
-
-@app.get("/")
 async def root():
     """Health check endpoint"""
-    return {"message": "QuantDash API is running", "status": "healthy"}
+    return {
+        'statusCode': 200,
+        'statusMessage': 'Success',
+        'content': 'Welcome to QuantDash API!'
+    }
 
-@app.get("/health")
 async def health_check():
     """Health check for monitoring"""
     return {"status": "healthy", "service": "quantdash-backend"}
 
 # Enable CORS for frontend communication
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",  # Local development
-        "http://10.0.0.116:5173", # Network access for mobile
-        "https://quantdash-frontend.onrender.com",  # Production frontend
-        "https://*.onrender.com",  # Allow all Render subdomains
-        "*"  # Allow all origins for development (remove in production if needed)
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+#app.add_middleware(
+#    CORSMiddleware,
+#    allow_origins=[
+#        "http://localhost:5173",  # Local development
+#        "http://10.0.0.116:5173", # Network access for mobile
+#        "https://quantdash-frontend.onrender.com",  # Production frontend
+#        "https://*.onrender.com",  # Allow all Render subdomains
+#        "*"  # Allow all origins for development (remove in production if needed)
+#    ],
+#    allow_credentials=True,
+#    allow_methods=["*"],
+#    allow_headers=["*"],
+#)
 
 class BacktestRequest(BaseModel):
     symbol: str  # Changed from 'ticker' to match frontend
@@ -67,7 +63,6 @@ class BacktestRequest(BaseModel):
     initial_cash: Optional[int] = 10000
     algorithm_specific_params: Optional[Dict] = {}
 
-@app.get("/api/tickers")
 async def get_available_tickers():
     """Get list of available stock tickers from cache"""
     try:
@@ -81,7 +76,6 @@ async def get_available_tickers():
     except Exception as e:
         return {"success": False, "error": str(e)}
 
-@app.get("/api/strategies")
 async def get_available_strategies():
     """Get list of available trading strategies with their parameters"""
     strategies = {
@@ -142,23 +136,21 @@ async def get_available_strategies():
     return {"success": True, "strategies": strategies}
 
 # Add middleware to log all requests
-@app.middleware("http")
-async def log_requests(request, call_next):
-    print(f"Incoming request: {request.method} {request.url}")
-    if request.method == "POST":
-        # Try to read the body for debugging
-        try:
-            body = await request.body()
-            print(f"Request body: {body.decode()}")
-        except Exception as e:
-            print(f"Could not read body: {e}")
-    
-    response = await call_next(request)
-    print(f"Response status: {response.status_code}")
-    return response
+#@app.middleware("http")
+#async def log_requests(request, call_next):
+#    print(f"Incoming request: {request.method} {request.url}")
+#    if request.method == "POST":
+#        # Try to read the body for debugging
+#        try:
+#            body = await request.body()
+#            print(f"Request body: {body.decode()}")
+#        except Exception as e:
+#            print(f"Could not read body: {e}")
+#
+#    response = await call_next(request)
+#    print(f"Response status: {response.status_code}")
+#    return response
 
-
-@app.post("/api/backtest")
 async def run_backtest(request: BacktestRequest):
     try:
         print(f"Received request: {request}")
@@ -307,8 +299,8 @@ async def run_backtest(request: BacktestRequest):
         print(f"Traceback: {traceback.format_exc()}")
         return {"success": False, "error": error_msg}
 
-if __name__ == "__main__":
-    import uvicorn
-    # Use PORT environment variable for Render deployment
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+#if __name__ == "__main__":
+#    import uvicorn
+#    # Use PORT environment variable for Render deployment
+#    port = int(os.environ.get("PORT", 8000))
+#    uvicorn.run(app, host="0.0.0.0", port=port)
