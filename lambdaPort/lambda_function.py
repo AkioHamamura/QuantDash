@@ -1,10 +1,10 @@
-from src.backtesting.engine import BacktestEngine
-from src.strategies.ma_crossover import MovingAverageCrossover
-from src.data.data_fetcher import fetch_stock_data
-from src.backtesting.viz import visualize_results
-from src.utils.globals import DATA_PATH
+#from src.backtesting.engine import BacktestEngine
+#from src.strategies.ma_crossover import MovingAverageCrossover
+#from src.data.data_fetcher import fetch_stock_data
+#from src.backtesting.viz import visualize_results
+#from src.utils.globals import DATA_PATH
 #from src.api.server import *
-from src.api.server import *
+from lambdaPort.src.api.server import *
 """
 Main entry point for the Quantdash Lambda function
 """

@@ -18,16 +18,16 @@ if backend_path not in sys.path:
 print(f"Python path includes: {backend_src_path}")
 print(f"Python path includes: {backend_path}")
 
-from ..backtesting.engine import BacktestEngine
-from ..strategies.ma_crossover import MovingAverageCrossover
-from ..strategies.bollinger_breakout import BollingerBreakout
-from ..strategies.dual_momentum import DualMomentum
-from ..strategies.gap_fade import GapFade
-from ..strategies.rsi_pullback import RSIPullback
-from ..strategies.turtle_breakout import TurtleBreakout
-from ..data.data_fetcher import fetch_stock_data, fetch_cached_data
-from ..utils.helpers import make_json_serializable
-from ..utils.globals import DATA_PATH
+from lambdaPort.src.backtesting.engine import BacktestEngine
+from lambdaPort.src.strategies.ma_crossover import MovingAverageCrossover
+from lambdaPort.src.strategies.bollinger_breakout import BollingerBreakout
+from lambdaPort.src.strategies.dual_momentum import DualMomentum
+from lambdaPort.src.strategies.gap_fade import GapFade
+from lambdaPort.src.strategies.rsi_pullback import RSIPullback
+from lambdaPort.src.strategies.turtle_breakout import TurtleBreakout
+from lambdaPort.src.data.data_fetcher import fetch_stock_data, fetch_cached_data
+from lambdaPort.src.utils.helpers import make_json_serializable
+from lambdaPort.src.utils.globals import DATA_PATH
 
 async def root():
     """Health check endpoint"""
