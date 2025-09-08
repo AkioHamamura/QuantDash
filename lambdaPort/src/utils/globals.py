@@ -4,3 +4,4 @@ import boto3
 #BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 BACKEND_DIR = '/'
 DATA_PATH = os.path.join(BACKEND_DIR, "cache")
+BUCKET_NAME = 'quant-dash-cache'

@@ -7,7 +7,7 @@ import time
 import os
 
 # Fix import path when running from different directories
-from utils.globals import DATA_PATH
+from ..utils.globals import DATA_PATH
 
 def write_available_tickers(cache_dir=DATA_PATH, interval="1d"):
     """
@@ -128,7 +128,7 @@ def fetch_stock_data(ticker,
         fetch_stock_data("NVDA", force_refresh=True)       # Force fresh download
         fetch_stock_data("NVDA", start_date="2020-01-01", end_date="2023-12-31") # Custom date range
     """
-    import os
+
     
     # Generate cache filename based on parameters
     if period is None: period = "max"  # Default to max if period is not specified

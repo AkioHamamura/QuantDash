@@ -1,12 +1,5 @@
-#from src.backtesting.engine import BacktestEngine
-#from src.strategies.ma_crossover import MovingAverageCrossover
-#from src.data.data_fetcher import fetch_stock_data
-#from src.backtesting.viz import visualize_results
-#from src.utils.globals import DATA_PATH
-#from src.api.server import *
-#from lambdaPort.src.api.server import *
 from .api.server import *
-
+from .utils.lambdaFunctionsTester import *
 """
 Main entry point for the Quantdash Lambda function
 """
@@ -22,16 +15,16 @@ def handler(event, context):
     if event['route'] == '/':
         return root()
 
-    if event['route'] == '/health':
-       return health_check()
+    if event['route'] == '/test':
+        return beginTest()
 
     if event['route'] == '/api/tickers':
-       return get_available_tickers()
+        return get_available_tickers()
 
-    if event['strategies'] == '/api/strategies':
-       return get_available_strategies()
+    if event['route'] == '/api/strategies':
+        return get_available_strategies()
 
-    # event['route'] == 'api/backtest':
+    #if event['route'] == 'api/backtest':
     #    return run_backtest(event)
 
     else:
