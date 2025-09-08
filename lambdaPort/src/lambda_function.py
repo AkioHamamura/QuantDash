@@ -5,7 +5,8 @@
 #from src.utils.globals import DATA_PATH
 #from src.api.server import *
 #from lambdaPort.src.api.server import *
-from api.server import root
+from .api.server import root
+
 """
 Main entry point for the Quantdash Lambda function
 """
