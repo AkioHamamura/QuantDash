@@ -31,7 +31,7 @@ print(f"Python path includes: {backend_src_path}")
 print(f"Python path includes: {backend_path}")
 
 
-async def root():
+def root():
     """Health check endpoint"""
     return {
         'statusCode': 200,
@@ -39,7 +39,7 @@ async def root():
         'content': 'Welcome to QuantDash API!'
     }
 
-async def health_check():
+def health_check():
     """Health check for monitoring"""
     return {"status": "healthy", "service": "quantdash-backend"}
 

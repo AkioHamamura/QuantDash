@@ -5,7 +5,7 @@
 #from src.utils.globals import DATA_PATH
 #from src.api.server import *
 #from lambdaPort.src.api.server import *
-from .api.server import root
+from .api.server import *
 
 """
 Main entry point for the Quantdash Lambda function
@@ -18,21 +18,21 @@ def handler(event, context):
         }
     #Forwards the event body to the proper function
     #Example, if route = '/', execute async def root from src.api/servery.py
-
-    if 'route' == '/':
+    print(event)
+    if event['route'] == '/':
         return root()
 
-   # if 'route' == '/health':
-   #     return health_check()
-#
-   # if 'route' == '/api/tickers':
-   #     return get_available_tickers()
-#
-   # if 'route' == '/api/strategies':
-   #     return get_available_strategies()
-#
-   # if 'route' == 'api/backtest':
-   #     return run_backtest(event)
+    if event['route'] == '/health':
+       return health_check()
+
+    if event['route'] == '/api/tickers':
+       return get_available_tickers()
+
+    if event['strategies'] == '/api/strategies':
+       return get_available_strategies()
+
+    # event['route'] == 'api/backtest':
+    #    return run_backtest(event)
 
     else:
         return {
