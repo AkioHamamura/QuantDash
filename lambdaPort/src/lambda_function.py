@@ -4,7 +4,8 @@
 #from src.backtesting.viz import visualize_results
 #from src.utils.globals import DATA_PATH
 #from src.api.server import *
-from lambdaPort.src.api.server import *
+#from lambdaPort.src.api.server import *
+from api.server import root
 """
 Main entry point for the Quantdash Lambda function
 """
@@ -20,17 +21,17 @@ def handler(event, context):
     if 'route' == '/':
         return root()
 
-    if 'route' == '/health':
-        return health_check()
-
-    if 'route' == '/api/tickers':
-        return get_available_tickers()
-
-    if 'route' == '/api/strategies':
-        return get_available_strategies()
-
-    if 'route' == 'api/backtest':
-        return run_backtest(event)
+   # if 'route' == '/health':
+   #     return health_check()
+#
+   # if 'route' == '/api/tickers':
+   #     return get_available_tickers()
+#
+   # if 'route' == '/api/strategies':
+   #     return get_available_strategies()
+#
+   # if 'route' == 'api/backtest':
+   #     return run_backtest(event)
 
     else:
         return {
