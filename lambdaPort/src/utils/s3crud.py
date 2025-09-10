@@ -1,11 +1,8 @@
 import boto3
 
-def test(data):
+def put_s3_objects_client(bucket_name=None, data=None, object_key=None):
     #Just try to put the data as a csv to the s3 bucket
     s3_client = boto3.client('s3')
-    # Define bucket and key
-    bucket_name = 'quant-dash-cache'
-    object_key = 'test.csv'
 
     # Content to upload
     file_content = data.to_csv()
@@ -17,11 +14,18 @@ def test(data):
             Bucket=bucket_name,
             Key=object_key
         )
-        print(f"Object '{object_key}' uploaded successfully to bucket '{bucket_name}'.")
-        print(f"Response: {response}")
+        return {
+            'statusCode': 200,
+            'body': f"Object '{object_key}' uploaded successfully to bucket '{bucket_name}'.",
+            'response': response
+        }
 
     except Exception as e:
-        print(f"Error uploading object: {e}")
+        return {
+            'statusCode': 500,
+            'body': f"Error uploading object: {e}",
+            'error': 'Error uploading object to S3. Check your bucket name and object key.'
+        }
 
 
 def list_s3_objects_client(bucket_name, prefix=''):
@@ -36,12 +40,39 @@ def list_s3_objects_client(bucket_name, prefix=''):
     paginator = s3_client.get_paginator('list_objects_v2')
 
     # Iterate through pages to handle large number of objects
-    for page in paginator.paginate(Bucket=bucket_name, Prefix=prefix):
-        if 'Contents' in page:
-            for obj in page['Contents']:
-                print(obj['Key'])
-        else:
-            print(f"No objects found in '{bucket_name}' with prefix '{prefix}'.")
+    try:
+        for page in paginator.paginate(Bucket=bucket_name, Prefix=prefix):
+            if 'Contents' in page:
+                for obj in page['Contents']:
+                    return{
+                        'statusCode': 200,
+                        'body': obj['Key']
+                    }
+            else:
+                return {
+                    'statusCode': 201,
+                    'body': f"Listable, but no objects found in '{bucket_name}' with prefix '{prefix}'."
+                }
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': f"Error listing objects: {e}"
+        }
+
+def read_s3_object_client(bucket_name, object_key):
+    s3_client = boto3.client('s3')
+    try:
+        response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
+        print(response)
+        return {
+            'statusCode': 200,
+            'body': response
+        }
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': f"Error reading object: {e}"
+        }
 
 # Example usage:
 # list_s3_objects_client('your-bucket-name')
