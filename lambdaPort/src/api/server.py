@@ -5,17 +5,17 @@ import os
 import numpy as np
 
 
-#from ..backtesting.engine import BacktestEngine
-#from ..strategies.ma_crossover import MovingAverageCrossover
-#from ..strategies.bollinger_breakout import BollingerBreakout
-#from ..strategies.dual_momentum import DualMomentum
-#from ..strategies.gap_fade import GapFade
-#from ..strategies.rsi_pullback import RSIPullback
-#from ..strategies.turtle_breakout import TurtleBreakout
-#from ..data.data_fetcher import fetch_stock_data, fetch_cached_data
-#from ..utils.helpers import make_json_serializable
+from ..backtesting.engine import BacktestEngine
+from ..strategies.ma_crossover import MovingAverageCrossover
+from ..strategies.bollinger_breakout import BollingerBreakout
+from ..strategies.dual_momentum import DualMomentum
+from ..strategies.gap_fade import GapFade
+from ..strategies.rsi_pullback import RSIPullback
+from ..strategies.turtle_breakout import TurtleBreakout
+from ..data.data_fetcher import fetch_stock_data, fetch_cached_data
+from ..utils.helpers import make_json_serializable
 from ..utils.globals import DATA_PATH
-#from datetime import datetime, date
+from datetime import datetime, date
 
 # Add the backend/src directory to a Python path for imports
 backend_src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -43,27 +43,13 @@ def health_check():
     """Health check for monitoring"""
     return {"status": "healthy", "service": "quantdash-backend"}
 
-# Enable CORS for frontend communication
-#app.add_middleware(
-#    CORSMiddleware,
-#    allow_origins=[
-#        "http://localhost:5173",  # Local development
-#        "http://10.0.0.116:5173", # Network access for mobile
-#        "https://quantdash-frontend.onrender.com",  # Production frontend
-#        "https://*.onrender.com",  # Allow all Render subdomains
-#        "*"  # Allow all origins for development (remove in production if needed)
-#    ],
-#    allow_credentials=True,
-#    allow_methods=["*"],
-#    allow_headers=["*"],
-#)
 
-#class BacktestRequest(BaseModel):
-#    symbol: str  # Changed from 'ticker' to match frontend
-#    period: str = "1y"
-#    algorithm: str = "moving_average_crossover"
-#    initial_cash: Optional[int] = 10000
-#    algorithm_specific_params: Optional[Dict] = {}
+class BacktestRequest(BaseModel):
+    symbol: str  # Changed from 'ticker' to match frontend
+    period: str = "1y"
+    algorithm: str = "moving_average_crossover"
+    initial_cash: Optional[int] = 10000
+    algorithm_specific_params: Optional[Dict] = {}
 
 async def get_available_tickers():
     """Get list of available stock tickers from cache"""
@@ -153,156 +139,150 @@ async def get_available_strategies():
 #    print(f"Response status: {response.status_code}")
 #    return response
 
-#async def run_backtest(request: BacktestRequest):
-#    try:
-#        print(f"Received request: {request}")
-#
-#        # Fetch data using your existing function
-#        print(f"Fetching cached data for {request.symbol}, period: {request.period}")
-#        data = fetch_cached_data(request.symbol, period=request.period)
-#
-#        # Debug data fetching
-#        print(f"Data result: {type(data)}")
-#        if data is not None:
-#            print(f"Data shape: {data.shape}")
-#            print(f"Data columns: {list(data.columns)}")
-#            print(f"Data index type: {type(data.index)}")
-#            print(f"Data not empty: {not data.empty}")
-#        else:
-#            print("Data is None")
-#
-#        if data is None or data.empty:
-#            print("Failed to fetch data - returning error")
-#            return {"success": False, "error": "Failed to fetch data"}
-#
-#        # Get algorithm parameters (support both old and new parameter names)
-#        params = request.algorithm_specific_params or {}
-#        print(f"Algorithm params: {params}")
-#
-#        # Initialize strategy based on algorithm type
-#        initial_cash = request.initial_cash or 10000
-#
-#        if request.algorithm == "moving_average_crossover":
-#            strategy = MovingAverageCrossover(
-#                fast_period=params.get("fast_period", 12),
-#                slow_period=params.get("slow_period", 26),
-#                initial_cash=initial_cash
-#            )
-#        elif request.algorithm == "bollinger_breakout":
-#            strategy = BollingerBreakout(
-#                period=params.get("period", 20),
-#                std_dev=params.get("std_dev", 2.0),
-#                initial_cash=initial_cash
-#            )
-#        elif request.algorithm == "dual_momentum":
-#            strategy = DualMomentum(
-#                lookback_period=params.get("lookback_period", 60),
-#                risk_free_rate=params.get("risk_free_rate", 0.02),
-#                initial_cash=initial_cash
-#            )
-#        elif request.algorithm == "gap_fade":
-#            strategy = GapFade(
-#                gap_threshold=params.get("gap_threshold", 0.02),
-#                stop_loss=params.get("stop_loss", 0.05),
-#                initial_cash=initial_cash
-#            )
-#        elif request.algorithm == "rsi_pullback":
-#            strategy = RSIPullback(
-#                rsi_period=params.get("rsi_period", 14),
-#                ma_period=params.get("ma_period", 50),
-#                oversold=params.get("oversold", 30),
-#                overbought=params.get("overbought", 70),
-#                initial_cash=initial_cash
-#            )
-#        elif request.algorithm == "turtle_breakout":
-#            strategy = TurtleBreakout(
-#                entry_period=params.get("entry_period", 20),
-#                exit_period=params.get("exit_period", 10),
-#                atr_period=params.get("atr_period", 20),
-#                risk_percent=params.get("risk_percent", 0.02),
-#                initial_cash=initial_cash
-#            )
-#        else:
-#            # Default to moving average crossover
-#            strategy = MovingAverageCrossover(
-#                fast_period=params.get("fast_period", 12),
-#                slow_period=params.get("slow_period", 26),
-#                initial_cash=initial_cash
-#            )
-#
-#        print(f"Strategy initialized: {strategy}")
-#        print(f"Strategy name: {strategy.name}")
-#
-#        # Run backtest
-#        engine = BacktestEngine(strategy)
-#        print("Running backtest...")
-#        results, viz = engine.run(data, visualize=True)
-#
-#
-#
-#        print(f"Raw results type: {type(results)}")
-#        print(f"Raw results keys: {list(results.keys()) if isinstance(results, dict) else 'Not a dict'}")
-#
-#        # Remove problematic fields that aren't needed for frontend
-#        if isinstance(results, dict):
-#            # Remove the 'data' field as it likely contains the original DataFrame
-#            results_copy = results.copy()
-#            if 'data' in results_copy:
-#                print(f"Removing 'data' field of type: {type(results_copy['data'])}")
-#                del results_copy['data']
-#            results = results_copy
-#
-#        # Convert results to JSON-serializable format
-#        serializable_results = make_json_serializable(results)
-#
-#        # Map your backend field names to frontend expected names
-#        if isinstance(serializable_results, dict):
-#            frontend_results = {
-#                "strategy": serializable_results.get("strategy", "Moving Average Crossover"),
-#                "parameters": serializable_results.get("parameters", {}),
-#                "total_return": serializable_results.get("total_return_pct", 0),
-#                "final_value": serializable_results.get("final_value", 0),
-#                "sharpe_ratio": serializable_results.get("sharpe_ratio", 0),
-#                "sortino_ratio": serializable_results.get("sortino_ratio", 0),
-#                "max_drawdown": serializable_results.get("max_drawdown_pct", 0),
-#                "volatility_pct": serializable_results.get("volatility_pct", 0),
-#                "win_rate": serializable_results.get("win_rate_pct", 0),
-#                "total_trades": serializable_results.get("total_trades", 0),
-#                "portfolio_values": serializable_results.get("portfolio_values", []),
-#                "trades": serializable_results.get("trades", [])
-#            }
-#        else:
-#            # Fallback if serialization didn't return a dict
-#            frontend_results = {
-#                "strategy": "Moving Average Crossover",
-#                "parameters": {},
-#                "total_return": 0,
-#                "final_value": 0,
-#                "sharpe_ratio": 0,
-#                "sortino_ratio": 0,
-#                "max_drawdown": 0,
-#                "volatility_pct": 0,
-#                "win_rate": 0,
-#                "total_trades": 0,
-#                "portfolio_values": [],
-#                "trades": []
-#            }
-#
-#        return {
-#            "success": True,
-#            "data": frontend_results,
-#            "visualizations": viz  # Include the visualization data from get_json_visualizations()
-#        }
-#
-#    except Exception as e:
-#        import traceback
-#        error_msg = f"Error: {str(e)}"
-#        print(f"Exception occurred: {error_msg}")
-#        print(f"Traceback: {traceback.format_exc()}")
-#        return {"success": False, "error": error_msg}
+async def run_backtest(request: BacktestRequest):
+    try:
+        print(f"Received request: {request}")
 
-#if __name__ == "__main__":
-#    import uvicorn
-#    # Use PORT environment variable for Render deployment
-#    port = int(os.environ.get("PORT", 8000))
-#    uvicorn.run(app, host="0.0.0.0", port=port)
+        # Fetch data using your existing function
+        print(f"Fetching cached data for {request.symbol}, period: {request.period}")
+        data = fetch_cached_data(request.symbol, period=request.period)
+
+        # Debug data fetching
+        print(f"Data result: {type(data)}")
+        if data is not None:
+            print(f"Data shape: {data.shape}")
+            print(f"Data columns: {list(data.columns)}")
+            print(f"Data index type: {type(data.index)}")
+            print(f"Data not empty: {not data.empty}")
+        else:
+            print("Data is None")
+
+        if data is None or data.empty:
+            print("Failed to fetch data - returning error")
+            return {"success": False, "error": "Failed to fetch data"}
+
+        # Get algorithm parameters (support both old and new parameter names)
+        params = request.algorithm_specific_params or {}
+        print(f"Algorithm params: {params}")
+
+        # Initialize strategy based on algorithm type
+        initial_cash = request.initial_cash or 10000
+
+        if request.algorithm == "moving_average_crossover":
+            strategy = MovingAverageCrossover(
+                fast_period=params.get("fast_period", 12),
+                slow_period=params.get("slow_period", 26),
+                initial_cash=initial_cash
+            )
+        elif request.algorithm == "bollinger_breakout":
+            strategy = BollingerBreakout(
+                period=params.get("period", 20),
+                std_dev=params.get("std_dev", 2.0),
+                initial_cash=initial_cash
+            )
+        elif request.algorithm == "dual_momentum":
+            strategy = DualMomentum(
+                lookback_period=params.get("lookback_period", 60),
+                risk_free_rate=params.get("risk_free_rate", 0.02),
+                initial_cash=initial_cash
+            )
+        elif request.algorithm == "gap_fade":
+            strategy = GapFade(
+                gap_threshold=params.get("gap_threshold", 0.02),
+                stop_loss=params.get("stop_loss", 0.05),
+                initial_cash=initial_cash
+            )
+        elif request.algorithm == "rsi_pullback":
+            strategy = RSIPullback(
+                rsi_period=params.get("rsi_period", 14),
+                ma_period=params.get("ma_period", 50),
+                oversold=params.get("oversold", 30),
+                overbought=params.get("overbought", 70),
+                initial_cash=initial_cash
+            )
+        elif request.algorithm == "turtle_breakout":
+            strategy = TurtleBreakout(
+                entry_period=params.get("entry_period", 20),
+                exit_period=params.get("exit_period", 10),
+                atr_period=params.get("atr_period", 20),
+                risk_percent=params.get("risk_percent", 0.02),
+                initial_cash=initial_cash
+            )
+        else:
+            # Default to moving average crossover
+            strategy = MovingAverageCrossover(
+                fast_period=params.get("fast_period", 12),
+                slow_period=params.get("slow_period", 26),
+                initial_cash=initial_cash
+            )
+
+        print(f"Strategy initialized: {strategy}")
+        print(f"Strategy name: {strategy.name}")
+
+        # Run backtest
+        engine = BacktestEngine(strategy)
+        print("Running backtest...")
+        results, viz = engine.run(data, visualize=True)
+
+
+
+        print(f"Raw results type: {type(results)}")
+        print(f"Raw results keys: {list(results.keys()) if isinstance(results, dict) else 'Not a dict'}")
+
+        # Remove problematic fields that aren't needed for frontend
+        if isinstance(results, dict):
+            # Remove the 'data' field as it likely contains the original DataFrame
+            results_copy = results.copy()
+            if 'data' in results_copy:
+                print(f"Removing 'data' field of type: {type(results_copy['data'])}")
+                del results_copy['data']
+            results = results_copy
+
+        # Convert results to JSON-serializable format
+        serializable_results = make_json_serializable(results)
+
+        # Map your backend field names to frontend expected names
+        if isinstance(serializable_results, dict):
+            frontend_results = {
+                "strategy": serializable_results.get("strategy", "Moving Average Crossover"),
+                "parameters": serializable_results.get("parameters", {}),
+                "total_return": serializable_results.get("total_return_pct", 0),
+                "final_value": serializable_results.get("final_value", 0),
+                "sharpe_ratio": serializable_results.get("sharpe_ratio", 0),
+                "sortino_ratio": serializable_results.get("sortino_ratio", 0),
+                "max_drawdown": serializable_results.get("max_drawdown_pct", 0),
+                "volatility_pct": serializable_results.get("volatility_pct", 0),
+                "win_rate": serializable_results.get("win_rate_pct", 0),
+                "total_trades": serializable_results.get("total_trades", 0),
+                "portfolio_values": serializable_results.get("portfolio_values", []),
+                "trades": serializable_results.get("trades", [])
+            }
+        else:
+            # Fallback if serialization didn't return a dict
+            frontend_results = {
+                "strategy": "Moving Average Crossover",
+                "parameters": {},
+                "total_return": 0,
+                "final_value": 0,
+                "sharpe_ratio": 0,
+                "sortino_ratio": 0,
+                "max_drawdown": 0,
+                "volatility_pct": 0,
+                "win_rate": 0,
+                "total_trades": 0,
+                "portfolio_values": [],
+                "trades": []
+            }
+
+        return {
+            "success": True,
+            "data": frontend_results,
+            "visualizations": viz  # Include the visualization data from get_json_visualizations()
+        }
+
+    except Exception as e:
+        import traceback
+        error_msg = f"Error: {str(e)}"
+        print(f"Exception occurred: {error_msg}")
+        print(f"Traceback: {traceback.format_exc()}")
+        return {"success": False, "error": error_msg}

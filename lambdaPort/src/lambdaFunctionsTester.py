@@ -31,7 +31,7 @@ class S3OperationsTest(unittest.TestCase):
         """Test uploading object to S3 bucket"""
         result = put_s3_objects_client(
             bucket_name=BUCKET_NAME,
-            data=self.test_data,
+            data=self.test_data.to_csv(),
             object_key=self.test_object_key
         )
         self.assertIn(result['statusCode'], [200, 201],

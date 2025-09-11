@@ -17,8 +17,8 @@ from dataclasses import dataclass
 from datetime import datetime
 import sys
 import os
-from strategies.base_strategy_class import BaseStrategy
-from backtesting.metrics import calculate_comprehensive_metrics
+from .base_strategy_class import BaseStrategy
+from ..backtesting.metrics import calculate_comprehensive_metrics
 
 
 class DualMomentum(BaseStrategy):

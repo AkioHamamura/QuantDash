@@ -17,7 +17,7 @@ def handler(event, context):
         return root()
 
     if event['route'] == '/test':
-        return beginTest()
+        return run_tests()
 
     if event['route'] == '/api/tickers':
         return get_available_tickers()

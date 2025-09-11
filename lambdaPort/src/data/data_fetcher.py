@@ -206,8 +206,9 @@ def fetch_stock_data(ticker,
             # Auto-save to cache (parquet preferred for performance)
             if use_cache:
                 try:
-                    put_s3_objects_client(bucket_name=BUCKET_NAME, data=data, object_key=f"cache/{cache_params}_data.parquet")
-                    #data.to_parquet(parquet_cache_file)
+                    #Convert the data to parquet format and save it to s3
+                    put_s3_objects_client(bucket_name=BUCKET_NAME, data=data.to_parquet(), object_key=f"cache/{cache_params}_data.parquet")
+
                     print(f"Data cached to {parquet_cache_file}")
                 except Exception as e:
                     print(f"Error saving parquet cache: {e}")

@@ -6,12 +6,12 @@ def put_s3_objects_client(bucket_name=None, data=None, object_key=None):
     s3_client = boto3.client('s3')
 
     # Content to upload
-    file_content = data.to_csv()
+
 
     try:
         # Upload the object
         response = s3_client.put_object(
-            Body=file_content,
+            Body=data,
             Bucket=bucket_name,
             Key=object_key
         )
