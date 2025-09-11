@@ -1,5 +1,5 @@
 from .api.server import *
-from .utils.lambdaFunctionsTester import *
+from lambdaPort.src.lambdaFunctionsTester import *
 
 """
 Main entry point for the Quantdash Lambda function

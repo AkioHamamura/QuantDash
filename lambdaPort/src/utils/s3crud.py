@@ -1,4 +1,5 @@
 import boto3
+from .globals import BUCKET_NAME
 
 def put_s3_objects_client(bucket_name=None, data=None, object_key=None):
     #Just try to put the data as a csv to the s3 bucket
@@ -43,11 +44,10 @@ def list_s3_objects_client(bucket_name, prefix=''):
     try:
         for page in paginator.paginate(Bucket=bucket_name, Prefix=prefix):
             if 'Contents' in page:
-                for obj in page['Contents']:
-                    return{
-                        'statusCode': 200,
-                        'body': obj['Key']
-                    }
+                return{
+                    'statusCode': 200,
+                    'body': f"Listed objects in '{bucket_name}' with prefix '{prefix}':" + str(page['Contents'])
+                }
             else:
                 return {
                     'statusCode': 201,
@@ -59,14 +59,16 @@ def list_s3_objects_client(bucket_name, prefix=''):
             'body': f"Error listing objects: {e}"
         }
 
-def read_s3_object_client(bucket_name, object_key):
+def read_s3_object_client(bucket_name=BUCKET_NAME, object_key="NVDA"):
     s3_client = boto3.client('s3')
     try:
+        # Get the object instead of downloading it
         response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
-        print(response)
+        # Read the content from the response
+        file_content = response['Body'].read()
         return {
             'statusCode': 200,
-            'body': response
+            'body': file_content
         }
     except Exception as e:
         return {

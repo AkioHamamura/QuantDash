@@ -28,7 +28,7 @@ docs/
 .env
 .venv
 env/
-venv/
+lambdaPort/venv/
 ENV/
 env.bak/
 venv.bak/

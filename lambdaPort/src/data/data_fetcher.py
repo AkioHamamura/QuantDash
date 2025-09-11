@@ -5,6 +5,7 @@ import sys
 import yfinance as yf
 import time
 import os
+import io
 
 # Fix import path when running from different directories
 from ..utils.globals import *
@@ -20,76 +21,81 @@ def write_available_tickers(cache_dir=DATA_PATH, interval="1d"):
     #            ticker = file.split("_")[0]
     #            f.write(f"{ticker}\n")
     availableTickers = read_s3_object_client(BUCKET_NAME, f"cache/available_tickers_{interval}.txt")
-    filesInDirectory = list_s3_objects_client(BUCKET_NAME,f"cache/")
-    print(availableTickers)
-    print(filesInDirectory)
+    filesInDirectory = list_s3_objects_client(BUCKET_NAME, "cache/")
+
 
 
 def fetch_cached_data(ticker, period=None, start_date=None, end_date=None, interval="1d"):
     """
     Fetch cached data for a specific ticker and time range.
-
-    works for both single index and multi-index dataframes.
-    
-    Note: yfinance DataFrames can have MultiIndex columns structure like:
-    - Single ticker: Columns are ('Open', 'High', 'Low', 'Close', 'Volume')
-    - Multiple tickers: Columns are MultiIndex like (('Open', 'AAPL'), ('Close', 'AAPL'))
-    
-    Since we cache max data and filter by period, we handle potential MultiIndex by flattening.
     """
-    cache_file = f"{DATA_PATH}/{ticker}_max_None_None_{interval}_data.parquet"
-    if not os.path.exists(cache_file):
-        return None
+    try:
+        # Get the S3 object
+        response = read_s3_object_client(
+            bucket_name=BUCKET_NAME, 
+            object_key=f"cache/{ticker}_{period}_{start_date}_{end_date}_{interval}_data.parquet"
+        )
         
-    data_df = pd.read_parquet(cache_file)
-    
-    # Handle MultiIndex columns - flatten them for easier access (from viz.py pattern)
-    if isinstance(data_df.columns, pd.MultiIndex):
-        # Flatten MultiIndex columns by taking the first level that's not empty
-        new_columns = []
-        for col in data_df.columns:
-            if isinstance(col, tuple):
-                # Take the first non-empty part of the tuple
-                new_col = col[0] if col[0] else col[1] if len(col) > 1 else str(col)
+        # Check if the response is successful and contains the data
+        if isinstance(response, dict):
+            if 'statusCode' in response and response['statusCode'] in [200, 201]:
+                if 'body' in response:
+                    # Convert the body content to BytesIO
+                    buffer = io.BytesIO(response['body'])
+                else:
+                    raise ValueError("No data found in S3 response body")
             else:
-                new_col = col
-            new_columns.append(new_col)
-        data_df.columns = new_columns
+                raise ValueError(f"S3 request failed with status: {response.get('statusCode')}")
+        else:
+            # If response is already bytes-like, use it directly
+            buffer = io.BytesIO(response)
+            
+        # Read the parquet data
+        data_df = pd.read_parquet(buffer)
+        # Handle MultiIndex columns
+        if isinstance(data_df.columns, pd.MultiIndex):
+            new_columns = []
+            for col in data_df.columns:
+                if isinstance(col, tuple):
+                    new_col = col[0] if col[0] else col[1] if len(col) > 1 else str(col)
+                else:
+                    new_col = col
+                new_columns.append(new_col)
+            data_df.columns = new_columns
 
-    if period is None and start_date is None and end_date is None:
-        # If no period or date range specified, return the entire cached data
-        return data_df
-    
-    if period is not None:
-        # If period is specified, filter the data from the last available date backwards
-        last_date = data_df.index.max()  # Get the most recent date in the dataset
-        
-        if period == "1mo":
-            return data_df[data_df.index >= last_date - pd.Timedelta(days=30)]
-        elif period == "6mo":
-            return data_df[data_df.index >= last_date - pd.Timedelta(days=180)]
-        elif period == "1y":
-            return data_df[data_df.index >= last_date - pd.Timedelta(days=365)]
-        elif period == "2y":
-            return data_df[data_df.index >= last_date - pd.Timedelta(days=2*365)]
-        elif period == "3y":
-            return data_df[data_df.index >= last_date - pd.Timedelta(days=3*365)]
-        elif period == "4y":
-            return data_df[data_df.index >= last_date - pd.Timedelta(days=4*365)]
-        elif period == "5y":
-            return data_df[data_df.index >= last_date - pd.Timedelta(days=5*365)]
-        elif period == "max":
+        # Filter data based on period or dates
+        if period is None and start_date is None and end_date is None:
             return data_df
-    
-    # Handle start_date and end_date filtering if provided
-    if start_date is not None or end_date is not None:
-        if start_date:
-            data_df = data_df[data_df.index >= pd.to_datetime(start_date)]
-        if end_date:
-            data_df = data_df[data_df.index <= pd.to_datetime(end_date)]
+        
+        if period is not None:
+            last_date = data_df.index.max()
+            
+            period_map = {
+                "1mo": 30,
+                "6mo": 180,
+                "1y": 365,
+                "2y": 2*365,
+                "3y": 3*365,
+                "4y": 4*365,
+                "5y": 5*365,
+                "max": None
+            }
+            
+            if period in period_map:
+                if period_map[period] is not None:
+                    return data_df[data_df.index >= last_date - pd.Timedelta(days=period_map[period])]
+                return data_df
+        
+        if start_date is not None or end_date is not None:
+            if start_date:
+                data_df = data_df[data_df.index >= pd.to_datetime(start_date)]
+            if end_date:
+                data_df = data_df[data_df.index <= pd.to_datetime(end_date)]
+        
         return data_df
-    
-    return data_df
+        
+    except Exception as e:
+        raise Exception(f"Error fetching cached data: {str(e)}")
 
 
 
@@ -145,31 +151,34 @@ def fetch_stock_data(ticker,
         print("Checking for cached data...")
         print(f"Looking for cache files at: {DATA_PATH}")
         print(f"Parquet cache file: {parquet_cache_file}")
-        print(f"CSV cache file: {csv_cache_file}")
+        #print(f"CSV cache file: {csv_cache_file}")
         
         # Check for parquet cache first (faster)
-        if os.path.exists(parquet_cache_file):
+        #Check if the file exists on s3
+        response = read_s3_object_client(bucket_name=BUCKET_NAME, object_key=f"cache/{cache_params}_data.parquet" )
+        if response['statusCode'] == 200:
             try:
                 print(f"Loading {ticker} from parquet cache...")
                 start_time = time.time()
-                data = pd.read_parquet(parquet_cache_file)
-                load_time = (time.time() - start_time) * 1000  # Convert to milliseconds
-                print(f"Loaded cached data: {data.shape[0]} rows in {load_time:.2f} ms")
+                #data = pd.read_parquet(parquet_cache_file)
+                #load_time = (time.time() - start_time) * 1000  # Convert to milliseconds
+                #print(f"Loaded cached data: {data.shape[0]} rows in {load_time:.2f} ms")
+                data = fetch_cached_data(ticker, period, start_date, end_date, interval)
                 return data
             except Exception as e:
                 print(f"Error loading parquet cache: {e}")
         
         # Check for CSV cache as fallback
-        elif os.path.exists(csv_cache_file):
-            try:
-                print(f"Loading {ticker} from CSV cache...")
-                start_time = time.time()
-                data = pd.read_csv(csv_cache_file, index_col=0, parse_dates=True)
-                load_time = (time.time() - start_time) * 1000  # Convert to milliseconds
-                print(f"Loaded cached data: {data.shape[0]} rows in {load_time:.2f} ms")
-                return data
-            except Exception as e:
-                print(f"Error loading CSV cache: {e}")
+        #elif os.path.exists(csv_cache_file):
+        #    try:
+        #        print(f"Loading {ticker} from CSV cache...")
+        #        start_time = time.time()
+        #        data = pd.read_csv(csv_cache_file, index_col=0, parse_dates=True)
+        #        load_time = (time.time() - start_time) * 1000  # Convert to milliseconds
+        #        print(f"Loaded cached data: {data.shape[0]} rows in {load_time:.2f} ms")
+        #        return data
+        #    except Exception as e:
+        #        print(f"Error loading CSV cache: {e}")
         else:
             print(f"No cache files found at expected locations")
     
@@ -197,22 +206,23 @@ def fetch_stock_data(ticker,
             # Auto-save to cache (parquet preferred for performance)
             if use_cache:
                 try:
-                    data.to_parquet(parquet_cache_file)
+                    put_s3_objects_client(bucket_name=BUCKET_NAME, data=data, object_key=f"cache/{cache_params}_data.parquet")
+                    #data.to_parquet(parquet_cache_file)
                     print(f"Data cached to {parquet_cache_file}")
                 except Exception as e:
                     print(f"Error saving parquet cache: {e}")
             
             # Save to parquet if explicitly requested
-            if save_to_parquet:
-                explicit_parquet = f"{DATA_PATH}/{ticker}_data.parquet"
-                data.to_parquet(explicit_parquet)
-                print(f"Data saved to {explicit_parquet}")
-
-            # Save to CSV if explicitly requested
-            if save_to_csv:
-                explicit_csv = f"{DATA_PATH}/{ticker}_data.csv"
-                data.to_csv(explicit_csv)
-                print(f"Data saved to {explicit_csv}")
+            #if save_to_parquet:
+            #    explicit_parquet = f"{DATA_PATH}/{ticker}_data.parquet"
+            #    data.to_parquet(explicit_parquet)
+            #    print(f"Data saved to {explicit_parquet}")
+#
+            ## Save to CSV if explicitly requested
+            #if save_to_csv:
+            #    explicit_csv = f"{DATA_PATH}/{ticker}_data.csv"
+            #    data.to_csv(explicit_csv)
+            #    print(f"Data saved to {explicit_csv}")
 
             return data
         else:
@@ -222,4 +232,3 @@ def fetch_stock_data(ticker,
     except Exception as e:
         print(f"Error fetching data for {ticker}: {e}")
         return None
-
