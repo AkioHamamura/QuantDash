@@ -1,13 +1,12 @@
 import unittest
-import pandas as pd
+import asyncio
+
 from http.client import responses
-from lambdaPort.src.utils.globals import BUCKET_NAME, DATA_PATH
-from lambdaPort.src.utils.s3crud import (
-    list_s3_objects_client,
-    put_s3_objects_client,
-    read_s3_object_client
-)
-from lambdaPort.src.data.data_fetcher import (write_available_tickers, fetch_cached_data, fetch_stock_data)
+from .data.data_fetcher import (write_available_tickers, fetch_cached_data, fetch_stock_data)
+from .api.server import *
+from .api.server import BacktestRequest
+from .utils.globals import *
+from .utils.s3crud import *
 
 class S3OperationsTest(unittest.TestCase):
     """Test suite for S3 bucket operations"""
@@ -19,13 +18,12 @@ class S3OperationsTest(unittest.TestCase):
             'col2': [3, 4]
         })
         self.test_object_key = 'test.csv'
-        self.read_object_key = 'cache/AAPL_max_None_None_1d_data.parquet'
-        #self.read_object_key = 'test.csv'
+        self.read_object_key = 'cache/PLTR_max_None_None_1d_data.parquet'
+
     def test_list_bucket_objects(self):
         """Test listing objects in S3 bucket"""
         result = list_s3_objects_client(BUCKET_NAME)
-        self.assertIn(result['statusCode'], [200, 201],
-                     "Failed to list bucket objects")
+        self.assertIsInstance(result, list, "list_s3_objects_client did not return a list")
 
     def test_upload_object(self):
         """Test uploading object to S3 bucket"""
@@ -59,7 +57,7 @@ class DataFetcherTest(unittest.TestCase):
 
     def test_fetch_cached_date(self):
         try:
-            result = fetch_cached_data(ticker="NVDA", period="max", interval="1d")
+            result = fetch_cached_data(ticker="AAPL", period="max", interval="1d")
             self.assertIsInstance(result, pd.DataFrame, "fetch_cached_data did not return a DataFrame")
             self.assertGreater(result.shape[0], 0, "fetch_cached_data returned an empty DataFrame")
         except Exception as e:
@@ -67,17 +65,54 @@ class DataFetcherTest(unittest.TestCase):
 
     def test_fetch_stock_data(self):
         try:
-            result = fetch_stock_data(ticker="PLTR", period="max", interval="1d")
+            result = fetch_stock_data(ticker="AAPL", period="max", interval="1d")
             self.assertIsInstance(result, pd.DataFrame, "fetch_stock_data did not return a DataFrame")
             self.assertGreater(result.shape[0], 0, "fetch_stock_data returned an empty DataFrame")
         except Exception as e:
             self.fail(f"fetch_stock_data raised an exception: {str(e)}")
 
+class apiserverTest(unittest.TestCase):
+    """Test suite for API server functionality"""
+    def test_root(self):
+        try:
+            result = root()
+            self.assertEqual(result['statusCode'], 200, "root endpoint returned an error")
+        except Exception as e:
+            self.fail(f"root endpoint raised an exception: {str(e)}")
+
+    def test_get_available_tickers(self):
+        #This will test if tickers can be retrieved
+        try:
+
+            result = asyncio.run(get_available_tickers())
+            self.assertEqual(result['success'], True, False)
+
+        except Exception as e:
+            self.fail(f"get_available_tickers raised an exception: {str(e)}")
+
+    def test_get_available_strategies(self):
+        #Test if the strategies dict is returned properly
+        try:
+            result = asyncio.run(get_available_strategies())
+            self.assertEqual(result['success'], True, False)
+        except Exception as e:
+            self.fail(f"get_available_strategies raised an exception: {str(e)}")
+
+    def test_run_backtest(self):
+        br = BacktestRequest(symbol="AAPL", period="max")
+        try:
+            result = asyncio.run(run_backtest(br))
+            self.assertEqual(result['success'], True, False)
+            self.assertIsInstance(result['data'], dict, "run_backtest did not return a dictionary")
+        except Exception as e:
+            self.fail(f"run_backtest raised an exception: {str(e)}")
+
 def run_tests():
     """Run all test suites"""
     test_suites = [
         unittest.TestLoader().loadTestsFromTestCase(S3OperationsTest),
-        unittest.TestLoader().loadTestsFromTestCase(DataFetcherTest)
+        unittest.TestLoader().loadTestsFromTestCase(DataFetcherTest),
+        unittest.TestLoader().loadTestsFromTestCase(apiserverTest)
     ]
     
     combined_suite = unittest.TestSuite(test_suites)

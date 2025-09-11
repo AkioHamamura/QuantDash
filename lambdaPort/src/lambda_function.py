@@ -1,5 +1,5 @@
 from .api.server import *
-from lambdaPort.src.lambdaFunctionsTester import *
+from .lambdaFunctionsTester import *
 
 """
 Main entry point for the Quantdash Lambda function
@@ -25,8 +25,8 @@ def handler(event, context):
     if event['route'] == '/api/strategies':
         return get_available_strategies()
 
-    #if event['route'] == 'api/backtest':
-    #    return run_backtest(event)
+    if event['route'] == '/api/backtest':
+        return run_backtest(event)
 
     else:
         return {

@@ -29,7 +29,7 @@ def put_s3_objects_client(bucket_name=None, data=None, object_key=None):
         }
 
 
-def list_s3_objects_client(bucket_name, prefix=''):
+def list_s3_objects_client(bucket_name, prefix="cache/"):
     """
     Lists objects in an S3 bucket using the S3 client.
 
@@ -37,22 +37,18 @@ def list_s3_objects_client(bucket_name, prefix=''):
         bucket_name (str): The name of the S3 bucket.
         prefix (str): Optional prefix to filter objects (e.g., a folder path).
     """
-    s3_client = boto3.client('s3')
-    paginator = s3_client.get_paginator('list_objects_v2')
-
-    # Iterate through pages to handle large number of objects
     try:
-        for page in paginator.paginate(Bucket=bucket_name, Prefix=prefix):
+        s3_client = boto3.client('s3')
+        paginator = s3_client.get_paginator('list_objects_v2')
+        keys = []
+        pages = paginator.paginate(Bucket=bucket_name, Prefix=prefix)
+
+        for page in pages:
             if 'Contents' in page:
-                return{
-                    'statusCode': 200,
-                    'body': f"Listed objects in '{bucket_name}' with prefix '{prefix}':" + str(page['Contents'])
-                }
-            else:
-                return {
-                    'statusCode': 201,
-                    'body': f"Listable, but no objects found in '{bucket_name}' with prefix '{prefix}'."
-                }
+                for obj in page['Contents']:
+                    if obj['Key'] not in ["cache/available_tickers_1d.txt","cache/event.json"]:
+                        keys.append(obj['Key'])
+        return keys
     except Exception as e:
         return {
             'statusCode': 500,

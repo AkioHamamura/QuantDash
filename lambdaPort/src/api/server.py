@@ -4,7 +4,8 @@ import sys
 import os
 import numpy as np
 
-
+from pydantic import BaseModel
+from ..utils.s3crud import *
 from ..backtesting.engine import BacktestEngine
 from ..strategies.ma_crossover import MovingAverageCrossover
 from ..strategies.bollinger_breakout import BollingerBreakout
@@ -46,7 +47,7 @@ def health_check():
 
 class BacktestRequest(BaseModel):
     symbol: str  # Changed from 'ticker' to match frontend
-    period: str = "1y"
+    period: str = "max"
     algorithm: str = "moving_average_crossover"
     initial_cash: Optional[int] = 10000
     algorithm_specific_params: Optional[Dict] = {}
@@ -54,13 +55,13 @@ class BacktestRequest(BaseModel):
 async def get_available_tickers():
     """Get list of available stock tickers from cache"""
     try:
-        tickers_file = os.path.join(DATA_PATH, "available_tickers_1d.txt")
-        if os.path.exists(tickers_file):
-            with open(tickers_file, 'r') as f:
-                tickers = [line.strip() for line in f.readlines() if line.strip()]
+        key = "cache/available_tickers_1d.txt"
+        response = read_s3_object_client(BUCKET_NAME, key)
+        if response['statusCode'] in [200, 201]:
+            tickers = [line.strip() for line in response['body'].splitlines() if line.strip()]
             return {"success": True, "tickers": sorted(tickers)}
         else:
-            return {"success": False, "error": "Tickers file not found"}
+            return {"success": False, "error": "Tickers file not found in S3"}
     except Exception as e:
         return {"success": False, "error": str(e)}
 
@@ -273,7 +274,6 @@ async def run_backtest(request: BacktestRequest):
                 "portfolio_values": [],
                 "trades": []
             }
-
         return {
             "success": True,
             "data": frontend_results,

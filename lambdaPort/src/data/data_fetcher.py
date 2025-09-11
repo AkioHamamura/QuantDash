@@ -10,18 +10,31 @@ import io
 # Fix import path when running from different directories
 from ..utils.globals import *
 from ..utils.s3crud import *
+from ..utils.helpers import *
+
 def write_available_tickers(cache_dir=DATA_PATH, interval="1d"):
     """
     Write available tickers (f"{ticker}_max_None_None_{interval}_data.parquet") to a text file for reference.
     This function is useful for debugging and ensuring the ticker list is up-to-date.
     """
-    #with open(f"{cache_dir}/available_tickers_{interval}.txt", "w") as f:
-    #    for file in os.listdir(cache_dir):
-    #        if file.endswith(f"max_None_None_{interval}_data.parquet"):
-    #            ticker = file.split("_")[0]
-    #            f.write(f"{ticker}\n")
-    availableTickers = read_s3_object_client(BUCKET_NAME, f"cache/available_tickers_{interval}.txt")
     filesInDirectory = list_s3_objects_client(BUCKET_NAME, "cache/")
+
+    files = ""
+    for file in filesInDirectory:
+        if file.endswith(f"_max_None_None_{interval}_data.parquet"):
+            print(file)
+            ticker = file.split("_")[0]
+            ticker = ticker.replace("cache/","")
+            files += ticker + "\n"
+
+
+    print(files)
+
+    put_s3_objects_client(bucket_name=BUCKET_NAME,
+                          data=files,
+                          object_key=f"cache/available_tickers_{interval}.txt")
+    
+
 
 
 
