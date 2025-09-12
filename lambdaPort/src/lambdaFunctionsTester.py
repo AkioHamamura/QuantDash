@@ -65,7 +65,7 @@ class DataFetcherTest(unittest.TestCase):
 
     def test_fetch_stock_data(self):
         try:
-            result = fetch_stock_data(ticker="AAPL", period="max", interval="1d")
+            result = fetch_stock_data(ticker="NVDA", period="max", interval="1d")
             self.assertIsInstance(result, pd.DataFrame, "fetch_stock_data did not return a DataFrame")
             self.assertGreater(result.shape[0], 0, "fetch_stock_data returned an empty DataFrame")
         except Exception as e:
@@ -94,14 +94,25 @@ class apiserverTest(unittest.TestCase):
         #Test if the strategies dict is returned properly
         try:
             result = asyncio.run(get_available_strategies())
+            print(result)
+            print(type(result))
             self.assertEqual(result['success'], True, False)
         except Exception as e:
             self.fail(f"get_available_strategies raised an exception: {str(e)}")
 
     def test_run_backtest(self):
-        br = BacktestRequest(symbol="AAPL", period="max")
+        btrequest = {
+            "route": "/test",
+            "back_test_request": {
+                "symbol": "NVDA",
+                "period": "max",
+                "algorithm": "moving_average_crossover",
+                "initial_cash": "10000"
+            }
+        }
+
         try:
-            result = asyncio.run(run_backtest(br))
+            result = asyncio.run(run_backtest(btrequest))
             self.assertEqual(result['success'], True, False)
             self.assertIsInstance(result['data'], dict, "run_backtest did not return a dictionary")
         except Exception as e:

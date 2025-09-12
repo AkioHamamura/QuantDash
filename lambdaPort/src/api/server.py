@@ -140,14 +140,23 @@ async def get_available_strategies():
 #    print(f"Response status: {response.status_code}")
 #    return response
 
-async def run_backtest(request: BacktestRequest):
+async def run_backtest(event):
+    #First of all, we need to create a BacktestRequest from the event json
+    request = BacktestRequest(
+        symbol=event.get("back_test_request").get("symbol"),
+        period=event.get("back_test_request").get("period"),
+        algorithm=event.get("back_test_request").get("algorithm"),
+        initial_cash=event.get("back_test_request").get("initial_cash"),
+        algorithm_specific_params=event.get("back_test_request").get("algorithm_specific_params")
+    )
+
     try:
         print(f"Received request: {request}")
 
         # Fetch data using your existing function
         print(f"Fetching cached data for {request.symbol}, period: {request.period}")
         data = fetch_cached_data(request.symbol, period=request.period)
-
+        if
         # Debug data fetching
         print(f"Data result: {type(data)}")
         if data is not None:

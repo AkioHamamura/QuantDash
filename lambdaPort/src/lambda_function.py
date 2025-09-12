@@ -1,6 +1,9 @@
-from .api.server import *
-from .lambdaFunctionsTester import *
+import json
+import sys
+import asyncio
 
+from lambdaPort.src.api.server import *
+from lambdaPort.src.lambdaFunctionsTester import *
 """
 Main entry point for the Quantdash Lambda function
 """
@@ -19,14 +22,14 @@ def handler(event, context):
     if event['route'] == '/test':
         return run_tests()
 
-    if event['route'] == '/api/tickers':
-        return get_available_tickers()
+    if event['route'] == '/tickers':
+        return asyncio.run(get_available_tickers())
 
-    if event['route'] == '/api/strategies':
-        return get_available_strategies()
+    if event['route'] == '/strategies':
+        return asyncio.run(get_available_strategies())
 
-    if event['route'] == '/api/backtest':
-        return run_backtest(event)
+    if event['route'] == '/backtest':
+        return asyncio.run(run_backtest(event))
 
     else:
         return {
@@ -34,3 +37,8 @@ def handler(event, context):
             'body': "Route not found"
         }
 
+if __name__ == "__main__":
+    #Use the event.json file
+    with open('event.json', 'r') as f:
+            event = json.load(f)
+    print(handler(event, None))
