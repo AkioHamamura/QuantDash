@@ -104,7 +104,7 @@ class apiserverTest(unittest.TestCase):
         btrequest = {
             "route": "/test",
             "back_test_request": {
-                "symbol": "NVDA",
+                "symbol": "AMD",
                 "period": "max",
                 "algorithm": "moving_average_crossover",
                 "initial_cash": "10000"

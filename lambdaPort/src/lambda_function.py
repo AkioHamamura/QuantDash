@@ -2,8 +2,8 @@ import json
 import sys
 import asyncio
 
-from lambdaPort.src.api.server import *
-from lambdaPort.src.lambdaFunctionsTester import *
+from .api.server import *
+from .lambdaFunctionsTester import *
 """
 Main entry point for the Quantdash Lambda function
 """
@@ -37,8 +37,9 @@ def handler(event, context):
             'body': "Route not found"
         }
 
-if __name__ == "__main__":
-    #Use the event.json file
-    with open('event.json', 'r') as f:
-            event = json.load(f)
-    print(handler(event, None))
+#if __name__ == "__main__":
+#    #Use the event.json file
+#    with open('event.json', 'r') as f:
+#            event = json.load(f)
+#    print(handler(event, None))
+#

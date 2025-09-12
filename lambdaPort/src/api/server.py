@@ -155,8 +155,9 @@ async def run_backtest(event):
 
         # Fetch data using your existing function
         print(f"Fetching cached data for {request.symbol}, period: {request.period}")
-        data = fetch_cached_data(request.symbol, period=request.period)
-        if
+        #data = fetch_cached_data(request.symbol, period=request.period)
+        data = fetch_stock_data(request.symbol, period=request.period)
+        print(data)
         # Debug data fetching
         print(f"Data result: {type(data)}")
         if data is not None:
