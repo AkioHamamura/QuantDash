@@ -1,6 +1,6 @@
 // Simple API service for QuantDash backend
 // Use environment variable for production, fallback to localhost for development
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://q5z6y4u3gc.execute-api.us-east-1.amazonaws.com/dev/api';
 
 export interface BacktestRequest {
   symbol: string;
@@ -36,18 +36,27 @@ export interface BacktestResponse {
 export const apiClient = {
   async runBacktest(request: BacktestRequest): Promise<BacktestResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/backtest`, {
+      const response = await fetch(`${API_BASE_URL}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(request),
+        body: JSON.stringify({
+          route: "/backtest",
+          back_test_request:{
+            symbol: request.symbol,
+            period: request.period,
+            algorithm: request.algorithm,
+            initial_cash: request.initial_cash,
+            algorithm_specific_params: request.algorithm_specific_params,
+          }
+        }),
       });
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+      console.log(response);
       return await response.json();
     } catch (error) {
       return {
@@ -60,12 +69,21 @@ export const apiClient = {
   // Get available stock tickers
   async getAvailableTickers(): Promise<{success: boolean; tickers?: string[]; error?: string}> {
     try {
-      const response = await fetch(`${API_BASE_URL}/tickers`);
-      
+      const response = await fetch(`${API_BASE_URL}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          route: "/tickers",
+
+        }),
+      });
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+      console.log(response)
       return await response.json();
     } catch (error) {
       return {
